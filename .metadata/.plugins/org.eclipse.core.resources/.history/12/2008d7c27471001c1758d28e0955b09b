@@ -1,0 +1,14 @@
+/**
+ * 
+ */
+package dev.nyr.main;
+
+import org.bukkit.event.Listener;
+
+/**
+ * @author janme
+ *
+ */
+public class UsefullListener implements Listener {
+
+}

@@ -1,0 +1,34 @@
+/**
+ * 
+ */
+package dev.nyr.main;
+
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerItemDamageEvent;
+
+import net.minecraft.network.protocol.game.ClientboundPlayerCombatEnterPacket;
+
+/**
+ * @author janme
+ *
+ */
+public class UsefullListener implements Listener 
+{
+	public void handleBreakBlockEvent(BlockBreakEvent event)
+	{
+		Player player = event.getPlayer();
+		Block block = event.getBlock();
+		block.getType();
+	}
+	
+	public void handlePlayerDammageEvent(PlayerInteractEntityEvent event1, PlayerItemDamageEvent event2)
+	{
+		HandlerList handlerList = event2.getHandlers();
+	}
+}

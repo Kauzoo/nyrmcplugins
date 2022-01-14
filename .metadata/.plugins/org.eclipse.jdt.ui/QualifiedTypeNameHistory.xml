@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.bukkit.event.block.BlockBreakEvent"/>
+    <fullyQualifiedTypeName name="org.bukkit.block.Block"/>
+    <fullyQualifiedTypeName name="net.minecraft.network.protocol.game.ClientboundPlayerCombatEnterPacket"/>
+    <fullyQualifiedTypeName name="org.bukkit.event.player.PlayerInteractEntityEvent"/>
+    <fullyQualifiedTypeName name="org.bukkit.event.player.PlayerItemDamageEvent"/>
+    <fullyQualifiedTypeName name="org.bukkit.event.HandlerList"/>
+    <fullyQualifiedTypeName name="org.bukkit.event.player.PlayerInteractAtEntityEvent"/>
+    <fullyQualifiedTypeName name="org.bukkit.event.entity.EntityDamageByEntityEvent"/>
+    <fullyQualifiedTypeName name="org.bukkit.entity.EntityType"/>
+    <fullyQualifiedTypeName name="org.bukkit.event.entity.EntityDamageEvent.DamageModifier"/>
+</qualifiedTypeNameHistroy>

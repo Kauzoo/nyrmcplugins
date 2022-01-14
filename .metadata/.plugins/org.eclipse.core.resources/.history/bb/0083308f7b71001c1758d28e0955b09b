@@ -1,0 +1,16 @@
+/**
+ * 
+ */
+package dev.nyr.main;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+
+/**
+ * @author janme
+ *
+ */
+public class UsefullListener implements Listener 
+{
+	Player player = new Player();
+}

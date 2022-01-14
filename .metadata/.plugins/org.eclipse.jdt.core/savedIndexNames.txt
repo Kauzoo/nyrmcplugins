@@ -1,0 +1,3 @@
+INDEX VERSION 1.131+D:\Dokumente\MinecraftDevelopment\nyrmcplugins\.metadata\.plugins\org.eclipse.jdt.core
+3019362234.index
+3017819538.index

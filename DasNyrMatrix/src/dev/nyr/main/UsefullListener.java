@@ -127,7 +127,7 @@ public class UsefullListener implements Listener
 					}
 					catch(Exception e)
 					{
-						Bukkit.broadcastMessage("Failed to parse Integer on x-Flag");
+						Bukkit.broadcastMessage("Failed to parse Integer on x-Flag. Using default x-Value: " + xSearchRadiusDefault);
 						e.printStackTrace();
 					}
 				}
@@ -139,7 +139,7 @@ public class UsefullListener implements Listener
 					}
 					catch(Exception e)
 					{
-						Bukkit.broadcastMessage("Failed to parse Integer on y-Flag");
+						Bukkit.broadcastMessage("Failed to parse Integer on y-Flag. Using default y-Value: " + ySearchRadiusDefault);
 						e.printStackTrace();
 					}
 				}
@@ -151,7 +151,7 @@ public class UsefullListener implements Listener
 					}
 					catch(Exception e)
 					{
-						Bukkit.broadcastMessage("Failed to parse Integer on z-Flag");
+						Bukkit.broadcastMessage("Failed to parse Integer on z-Flag. Using default z-Value: " + zSearchRadiusDefault);
 						e.printStackTrace();
 					}
 				}

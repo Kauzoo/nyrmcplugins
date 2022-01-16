@@ -1,0 +1,118 @@
+package dev.nyr.main;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+import java.io.*;
+import java.util.Scanner;
+
+import org.bukkit.plugin.PluginManager;
+
+public class main extends JavaPlugin{
+    @SuppressWarnings("unused")
+    private static main plugin;
+    
+    public void onEnable() 
+    {
+        System.out.println("Running nyrmcplugin");
+
+        plugin=this;
+        
+        CreateRequirements();
+        CreateNewFile();
+        ParseFile();
+        
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        pluginManager.registerEvents(new UsefullListener(),this);
+        
+    }
+    
+    private static void CreateRequirements()
+    {
+    	// Try creating relevant directories
+    	try
+    	{
+    		// Try create nyrmcplugin parent folder
+    		File nyrmcpluginFolder = new File("nyrmcplugin");
+    		if(nyrmcpluginFolder.exists())
+    		{
+    			System.out.println("[nyrmcplugin]: Folder nyrmcplugin exists");
+    			
+    		}
+    		else if(nyrmcpluginFolder.mkdir())
+    		{
+    			System.out.println("[nyrmcplugin]: Created folder " + nyrmcpluginFolder.getName());
+    			// Try create quickstack and selfdammage subfolder
+    			File quickStackFolder = new File(nyrmcpluginFolder.getAbsolutePath() + "\\quickstack");
+    			File selfDammageFolder = new File(nyrmcpluginFolder.getAbsolutePath() + "\\selfdammage");
+    			if(quickStackFolder.mkdir() && selfDammageFolder.mkdir())
+    			{
+    				System.out.println("[nyrmcplugin]: Created folder " + selfDammageFolder.getName());
+    				System.out.println("[nyrmcplugin]: Created folder " + quickStackFolder.getName());
+    				
+    				// Try create quickstack-settings and selfdammage-settings
+    				File quickStackSettings = new File(quickStackFolder.getAbsolutePath() + "\\quickstack-settings.txt");
+        			File selfDammageSettings = new File(selfDammageFolder.getAbsolutePath() + "\\selfdammage-settings.txt");
+    				System.out.println((quickStackSettings.createNewFile()) ? "[nyrmcplugin]: Created file " + quickStackSettings.getName() : "[nyrmcplugin]: Failed to create file " + quickStackSettings.getName());
+    				System.out.println((selfDammageSettings.createNewFile()) ? "[nyrmcplugin]: Created file " + selfDammageSettings.getName() : "[nyrmcplugin]: Failed to create file " + selfDammageSettings.getName());
+    				
+    				// Try create players folder
+    				File quickStackPlayerFolder = new File(quickStackFolder.getAbsolutePath() + "\\players");
+    				File selfDammagePlayerFolder = new File(selfDammageFolder.getAbsolutePath() + "\\players");
+    				System.out.println((quickStackPlayerFolder.mkdir()) ? "[nyrmcplugin]: Created folder " + quickStackPlayerFolder.getName() : "[nyrmcplugin]: Failed to create file " + quickStackPlayerFolder.getName());
+    				System.out.println((selfDammagePlayerFolder.mkdir()) ? "[nyrmcplugin]: Created folder " + selfDammagePlayerFolder.getName() : "[nyrmcplugin]: Failed to create file " + selfDammagePlayerFolder.getName());
+    			}
+    		}
+    	}
+    	catch(Exception e)
+    	{
+    		System.out.println("[nyrmcplugin]: Something went wrong during CreateRequirements");
+    		e.printStackTrace();
+    	}
+    }
+    
+    private static void CreateNewFile()
+    {
+    	try
+    	{
+    		String tmp = new File("").getAbsolutePath();
+    		System.out.println("Absolute path: " + tmp);
+    		tmp = tmp.concat("\\nyrmcplugin\\test.txt");
+    		System.out.println("Concat path: " + tmp);
+    		File file = new File(tmp);
+    		if (file.createNewFile())
+    		{
+    			System.out.println("File created");
+    		}
+    		else
+    		{
+    			System.out.println("File already exists");
+    		}
+    	}
+    	catch(IOException e)
+    	{
+    		System.out.println("Error");
+    		e.printStackTrace();
+    	}
+    }
+    
+    private static void ParseFile()
+    {
+    	try
+    	{
+    		String tmp = new File("").getAbsolutePath();
+    		tmp.concat("\\nyrmcplugin\\test.txt");
+    		File file = new File(tmp);
+    		Scanner myReader = new Scanner(file);
+    		while(myReader.hasNextLine())
+    		{
+    			String data = myReader.nextLine();
+    			System.out.println(data);
+    		}
+    		myReader.close();
+    	}
+    	catch(FileNotFoundException e)
+    	{
+    		System.out.println("funktioniert nicht");
+    		e.printStackTrace();
+    	}
+    }
+}

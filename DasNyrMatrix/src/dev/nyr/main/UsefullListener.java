@@ -35,63 +35,109 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import dev.nyr.main.SettingsWriter.SettingType;
+
 
 /**
- * @author janme
+ * @author nyr
  *
  */
 
 public class UsefullListener implements Listener 
-{	
+{
+	
 	/**
 	 * Command Settings
 	 */
 	// General
-	private static String pluginSettingsString = "nyr";
-	private static String pluginEnableQuickStackFlag = "-qst";
-	private static String pluginEnableSelfDammageFlag = "-sd";
-	private static String pluginOptionsDelim = ":";
-	private static String pluginHelpFlag = "-help";
-	private boolean enableQuickStack = false;
-	private boolean enableSelfDammage = false;
+	// DEFAULTS
+	public class PluginCommandDefaults
+	{
+		// Values
+		public static final String pluginSettingsString = "nyr";
+		public static final String pluginEnableQuickStackFlag = "-qst";
+		public static final String pluginEnableSelfDammageFlag = "-sd";
+		public static final String pluginOptionsDelim = ":";
+		public static final String pluginHelpFlag = "-help";
+		public static final boolean enableQuickStack = false;
+		public static final boolean enableSelfDammage = false;
+		// Keys
+		public static final String pluginSettingsStringKey = "pluginSettingsString";
+		public static final String pluginEnableQuickStackFlagKey = "pluginEnableQuickStackFlag";
+		public static final String pluginEnableSelfDammageFlagKey = "pluginEnableSelfDammageFlag";
+		public static final String pluginOptionsDelimKey = "pluginOptionsDelim";
+		public static final String pluginHelpFlagKey = "pluginHelpFlag";
+		public static final String enableQuickStackKey = "enableQuickStack";
+		public static final String enableSelfDammageKey = "enableSelfDammage";
+		
+	}
 	
 	// Quickstack
-	private static String enableQuickStackString = "qst"; 
-	private static String enableDebugFlag = "-debug";
-	private static String xValueFlag = "-x";
-	private static String yValueFlag = "-y";
-	private static String zValueFlag = "-z";
-	private static String sideValueFlag = "-a";
-	private static String valueFlagDelim = ":";
-	private static String quickStackHelpFlag = "-help";
-	
-	/**
-	 * Quickstack Settings
-	 */
-	private static final int xSearchRadiusDefault = 10; // specifies half the side length of the search box in X-Direction
-	private static final int ySearchRadiusDefault = 10; // specifies half the side length of the search box in y-Direction
-	private static final int zSearchRadiusDefault = 10; // specifies half the side length of the search box in z-Direction
-	private static final int searchRadiusMax = 20; // specifies max search radius
+	// DEFAULTS
+	public class QuickStackDefaults
+	{
+		// Values
+		public static final String enableQuickStackString = "qst"; 
+		public static final String enableDebugFlag = "-debug";
+		public static final String xValueFlag = "-x";
+		public static final String yValueFlag = "-y";
+		public static final String zValueFlag = "-z";
+		public static final String sideValueFlag = "-a";
+		public static final String valueFlagDelim = ":";
+		public static final String quickStackHelpFlag = "-help";
+		public static final int xSearchRadiusDefault = 10;
+		public static final int ySearchRadiusDefault = 10;
+		public static final int zSearchRadiusDefault = 10;
+		public static final int searchRadiusMax = 20;
+		
+		// Keys
+		public static final String enableQuickStackStringKey = "enableQuickStackString"; 
+		public static final String enableDebugFlagKey = "enableDebugFlag";
+		public static final String xValueFlagKey = "xValueFlag";
+		public static final String yValueFlagKey = "yValueFlag";
+		public static final String zValueFlagKey = "zValueFlag";
+		public static final String sideValueFlagKey = "sideValueFlag";
+		public static final String valueFlagDelimKey = "valueFlagDelim";
+		public static final String quickStackHelpFlagKey = "quickStackHelpFlag";
+		public static final String xSearchRadiusDefaultKey = "xSearchRadiusDefault";
+		public static final String ySearchRadiusDefaultKey = "ySearchRadiusDefault";
+		public static final String zSearchRadiusDefaultKey = "zSearchRadiusDefault";
+		public static final String searchRadiusMaxKey = "searchRadiusMax";
+		
+		// Other
+		public static final String quickStackExludeKey = "qstExclude";
+	}
 	
 	
 	@EventHandler
 	public void onPlayerJoinEvent(PlayerJoinEvent event)
 	{
 		Player player = event.getPlayer();
-		player.sendMessage("Server is nyrmcplugin");
-		player.sendMessage("Status: SelfDammage:" + enableSelfDammage + " QuickStack:" + enableQuickStack);
+		System.out.println("hot swap works");
+		player.sendMessage("Server is using nyrmcplugin test build");
+		player.sendMessage("Status: SelfDammage:" + isEnableSelfDammage(SettingType.PLUGINSETTINGS) + " QuickStack:" + isEnableQuickStack(SettingType.PLUGINSETTINGS));
 		player.sendMessage("WARNING: Exoerimental");
-		player.sendMessage("To learn more about QuickStack type: " + enableQuickStackString + " " + quickStackHelpFlag);
+		player.sendMessage("To learn more about QuickStack use: " + getEnableQuickStackString(SettingType.PLUGINSETTINGS) + " " + getQuickStackHelpFlag(SettingType.PLUGINSETTINGS));
 		if(player.isOp())
 		{
-			player.sendMessage("To lean more about nyrmcplugin type: " + pluginSettingsString + " " + pluginHelpFlag);
+			player.sendMessage("To lean more about nyrmcplugin use: " + getPluginSettingsString(SettingType.PLUGINSETTINGS) + " " + getPluginHelpFlag(SettingType.PLUGINSETTINGS));
 		}
+		try
+		{
+			SettingsWriter.CreateSettingFile(SettingType.QUICKSTACK_PLAYER, player.getDisplayName());
+			SettingsWriter.CreateSettingFile(SettingType.SELFDAMMAGE_PLAYER, player.getDisplayName());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
 	}
 	
 	@EventHandler
 	public void onPlayerDammageEvent(EntityDamageByEntityEvent event)
 	{
-		if(!enableSelfDammage)
+		if(!isEnableSelfDammage(SettingType.PLUGINSETTINGS))
 		{
 			return;
 		}
@@ -109,82 +155,96 @@ public class UsefullListener implements Listener
 	}
 	
 	/***
-	 * Used to check for a player wanting to quickstack
-	 * nyrplugin commands are always lead by "-"
-	 * In order to try quickstacking type -q
+	 * Parses chat messages for nyrmcplugin commands
 	 * @param playerChatEvent
 	 */
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void parseChatMessage(PlayerChatEvent playerChatEvent)
 	{
+		System.out.println("test " + getPluginSettingsString(SettingType.PLUGINSETTINGS));
 		Player player = playerChatEvent.getPlayer();
 		String inputString = playerChatEvent.getMessage();
 		List<String> message = Arrays.asList(inputString.split(" "));
 		/*
 		 * Parse message for plugin settings
 		 */
-		if(playerChatEvent.getPlayer().isOp() && !message.isEmpty() && message.get(0).startsWith(pluginSettingsString))
+		if(playerChatEvent.getPlayer().isOp() && !message.isEmpty() && message.get(0).startsWith(getPluginSettingsString(SettingType.PLUGINSETTINGS)))
 		{
+			System.out.println("test");
 			for(String s : message)
 			{
-				if(s.startsWith(pluginEnableQuickStackFlag + pluginOptionsDelim))
+				if(s.startsWith(getPluginEnableQuickStackFlag(SettingType.PLUGINSETTINGS)))
 				{
+					System.out.println("anderer test");
 					try
 					{
-						 enableQuickStack = Boolean.parseBoolean(s.split(pluginOptionsDelim)[1]);
-						 player.sendMessage("Changed value for enableQuickStack to: " + enableQuickStack);
-						 Bukkit.broadcastMessage("QuickStack is now: " + enableQuickStack);
+						 SettingsWriter.ChangeSetting(SettingType.PLUGINSETTINGS, PluginCommandDefaults.enableQuickStackKey, s.split(getPluginOptionsDelim(SettingType.PLUGINSETTINGS))[1], "=", null);
+						 player.sendMessage("Changed value for enableQuickStack to: " + isEnableQuickStack(SettingType.PLUGINSETTINGS));
+						 Bukkit.broadcastMessage("QuickStack is now: " +  isEnableQuickStack(SettingType.PLUGINSETTINGS));
 					}
 					catch(Exception e)
 					{
 						player.sendMessage("Failed to parse boolean on enableQuickStackFlag. Usage nyr -qst:<boolean>.");
-						player.sendMessage("Current value for enableQuickStack: " + enableQuickStack);
+						player.sendMessage("Current value for enableQuickStack: " + isEnableQuickStack(SettingType.PLUGINSETTINGS));
 						e.printStackTrace();
 					}
 				}
-				if(s.startsWith(pluginEnableSelfDammageFlag + pluginOptionsDelim))
+				if(s.startsWith(getPluginEnableSelfDammageFlag(SettingType.PLUGINSETTINGS) + getPluginOptionsDelim(SettingType.PLUGINSETTINGS)))
 				{
 					try
 					{
-						 enableQuickStack = Boolean.parseBoolean(s.split(pluginOptionsDelim)[1]);
-						 player.sendMessage("Changed value for enableSelfDammage to: " + enableSelfDammage);
-						 Bukkit.broadcastMessage("SelfDammage is now: " + enableSelfDammage);
+						 SettingsWriter.ChangeSetting(SettingType.PLUGINSETTINGS, PluginCommandDefaults.enableSelfDammageKey, s.split(getPluginOptionsDelim(SettingType.PLUGINSETTINGS))[1], "=", null); 
+						 player.sendMessage("Changed value for enableSelfDammage to: " + isEnableSelfDammage(SettingType.PLUGINSETTINGS));
+						 Bukkit.broadcastMessage("SelfDammage is now: " + isEnableSelfDammage(SettingType.PLUGINSETTINGS));
 					}
 					catch(Exception e)
 					{
 						player.sendMessage("Failed to parse boolean on enableSelfDammageFlag. Usage: nyr -sd:<boolean>.");
-						player.sendMessage("Current value for enableSelfDammage: " + enableSelfDammage);
+						player.sendMessage("Current value for enableSelfDammage: " + isEnableQuickStack(SettingType.PLUGINSETTINGS));
 						e.printStackTrace();
 					}
 				}
-				if(s.equals(pluginHelpFlag))
+				if(s.equals(getPluginHelpFlag(SettingType.PLUGINSETTINGS)))
 				{
 					printPluginHelp(player);
 				}
 			}
+			playerChatEvent.setCancelled(true);
 		}
-		if(!enableQuickStack)
-		{
-			return;
-		}
+		
 		/*
 		 * Parse message for quickStack
 		 */
-		if(!message.isEmpty() && message.get(0).equals(enableQuickStackString))
+		if(!message.isEmpty() && message.get(0).equals(getEnableQuickStackString(SettingType.QUICKSTACK)))
 		{
-			int xSearchRadius = xSearchRadiusDefault;
-			int ySearchRadius = ySearchRadiusDefault;
-			int zSearchRadius = zSearchRadiusDefault;
+			int xSearchRadius = getXsearchradiusdefault(SettingType.QUICKSTACK);
+			int ySearchRadius = getYsearchradiusdefault(SettingType.QUICKSTACK);
+			int zSearchRadius = getZsearchradiusdefault(SettingType.QUICKSTACK);
 			boolean debugFlag = false;
 			for(String s : message)
 			{
-				if(s.startsWith(sideValueFlag))
+				if(s.equals(getQuickStackHelpFlag(SettingType.QUICKSTACK)))
+				{
+					QuickStackCore.printQuickStackHelp(player);
+					return;
+				}
+				// Do not parse arguments except help when quickstack is disabled
+				if(!isEnableQuickStack(SettingType.PLUGINSETTINGS))
+				{
+					return;
+				}
+				if(s.startsWith("-add"))
+				{
+					QuickStackCore.AddQuickStackExclude(SettingType.QUICKSTACK_PLAYER, player);
+					return;
+				}
+				if(s.startsWith(getSideValueFlag(SettingType.QUICKSTACK)))
 				{
 					try
 					{
-						int i = Math.abs(Integer.parseInt(s.split(valueFlagDelim)[1]));
-						
+						int i = Math.abs(Integer.parseInt(s.split(getValueFlagDelim(SettingType.QUICKSTACK))[1]));
+						i = (i <= getSearchradiusmax(SettingType.QUICKSTACK)) ? i : getSearchradiusmax(SettingType.QUICKSTACK);
 						xSearchRadius = i;
 						ySearchRadius = i;
 						zSearchRadius = i;
@@ -192,158 +252,343 @@ public class UsefullListener implements Listener
 					catch(Exception e)
 					{
 						player.sendMessage("Failed to parse Integer on a-Flag");
-						printQuickStackHelp(player);
+						QuickStackCore.printQuickStackHelp(player);
 						e.printStackTrace();
 						return;
 					}
 					
 				}
-				if(s.startsWith(xValueFlag + valueFlagDelim))
+				if(s.startsWith(getxValueFlag(SettingType.QUICKSTACK) + getValueFlagDelim(SettingType.QUICKSTACK)))
 				{
 					try
 					{
-						xSearchRadius = Math.abs(Integer.parseInt(s.split(valueFlagDelim)[1]));
-						xSearchRadius = (xSearchRadius <= searchRadiusMax) ? xSearchRadius : searchRadiusMax;
+						xSearchRadius = Math.abs(Integer.parseInt(s.split(getValueFlagDelim(SettingType.QUICKSTACK))[1]));
+						xSearchRadius = (xSearchRadius <= getSearchradiusmax(SettingType.QUICKSTACK)) ? xSearchRadius : getSearchradiusmax(SettingType.QUICKSTACK);
 					}
 					catch(Exception e)
 					{
 						player.sendMessage("Failed to parse Integer on x-Flag");
-						printQuickStackHelp(player);
+						QuickStackCore.printQuickStackHelp(player);
 						e.printStackTrace();
 						return;
 					}
 				}
-				if(s.startsWith(yValueFlag + valueFlagDelim))
+				if(s.startsWith(getyValueFlag(SettingType.QUICKSTACK) + getValueFlagDelim(SettingType.QUICKSTACK)))
 				{
 					try
 					{
-						ySearchRadius = Math.abs(Integer.parseInt(s.split(valueFlagDelim)[1]));
-						ySearchRadius = (ySearchRadius <= searchRadiusMax) ? ySearchRadius : searchRadiusMax;
+						ySearchRadius = Math.abs(Integer.parseInt(s.split(getValueFlagDelim(SettingType.QUICKSTACK))[1]));
+						ySearchRadius = (ySearchRadius <= getSearchradiusmax(SettingType.QUICKSTACK)) ? ySearchRadius : getSearchradiusmax(SettingType.QUICKSTACK);
 					}
 					catch(Exception e)
 					{
 						player.sendMessage("Failed to parse Integer on y-Flag");
-						printQuickStackHelp(player);
+						QuickStackCore.printQuickStackHelp(player);
 						e.printStackTrace();
 						return;
 					}
 				}
-				if(s.startsWith(zValueFlag + valueFlagDelim))
+				if(s.startsWith(getzValueFlag(SettingType.QUICKSTACK) + getValueFlagDelim(SettingType.QUICKSTACK)))
 				{
 					try
 					{
-						zSearchRadius = Math.abs(Integer.parseInt(s.split(valueFlagDelim)[1]));
-						zSearchRadius = (zSearchRadius <= searchRadiusMax) ? zSearchRadius : searchRadiusMax;
+						zSearchRadius = Math.abs(Integer.parseInt(s.split(getValueFlagDelim(SettingType.QUICKSTACK))[1]));
+						zSearchRadius = (zSearchRadius <= getSearchradiusmax(SettingType.QUICKSTACK)) ? zSearchRadius : getSearchradiusmax(SettingType.QUICKSTACK);
 					}
 					catch(Exception e)
 					{
 						player.sendMessage("Failed to parse Integer on z-Flag");
-						printQuickStackHelp(player);
+						QuickStackCore.printQuickStackHelp(player);
 						e.printStackTrace();
 						return;
 					}
 				}
-				if(s.equals(enableDebugFlag))
+				if(s.equals(getQuickStackHelpFlag(SettingType.QUICKSTACK)))
 				{
 					debugFlag = true;
 				}
-				if(s.equals(quickStackHelpFlag))
-				{
-					printQuickStackHelp(player);
-					return;
-				}
 			}
-			this.lookForChests(playerChatEvent.getPlayer(), xSearchRadius, ySearchRadius, zSearchRadius, debugFlag);
+			QuickStackCore.lookForChests(playerChatEvent.getPlayer(), xSearchRadius, ySearchRadius, zSearchRadius, debugFlag);
 		}
+	}
 		
-	}
-	
-	/*
-	 * Handles looking for chests
+	/**
+	 * GETTERS
+	 * @return
 	 */
-	private void lookForChests(Player player, int xSearchRadius, int ySearchRadius, int zSearchRadius, boolean debug)
-	{
-		player.sendMessage("Searching for chests in your area");
-		int[] positionVector = { player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ() };
-		player.sendMessage("Using position " + "(" + positionVector[0] + "|" + positionVector[1] + "|" + positionVector[2] + ")");
-		player.sendMessage("Using SideLength X:" + xSearchRadius * 2 + " Y:" + ySearchRadius * 2 + " Z:" + zSearchRadius * 2);
-		
-		// x-Loop
-		for(int i = positionVector[0] - xSearchRadius; i < positionVector[0] + xSearchRadius; i++)
+	public static String getPluginSettingsString(SettingType type) {
+		String value = PluginCommandDefaults.pluginSettingsString;
+		try 
 		{
-			// y-Loop
-			for(int j = positionVector[1] - ySearchRadius; j < positionVector[1] + ySearchRadius; j++)
-			{
-				// z-Loop
-				for(int k = positionVector[2] - zSearchRadius; k < positionVector[2] + zSearchRadius; k++)
-				{
-					Block block = new Location(player.getWorld(), i, j, k).getBlock();
-					if(debug)
-					{
-						player.sendMessage("Looking for block @ (" + i + "|" + j + "|" + k + ") Block was " + block.getType().toString());
-					}
-					if(block.getType() == Material.CHEST)
-					{
-						if(debug)
-						{
-							player.sendMessage("Chest detected @ (" + i + "|" + j + "|" + k + ")");
-							System.out.println("Chest detected @ (" + i + "|" + j + "|" + k + ")");
-						}
-						this.handleQuickStack(player, (Chest) block.getState(), debug);
-					}
-				}
-			}
-		}
-	}
-	
-	/*
-	 * Quickstacks to a chest
-	 */
-	private void handleQuickStack(Player player, Chest chest, boolean debug)
-	{
-		Inventory chestInventory = chest.getInventory();
-		Inventory playerInventory = player.getInventory();
-		for(ItemStack itemStack : playerInventory.getStorageContents())
+			value = SettingsWriter.ReadSetting(type, "pluginSettingString", "=", null);
+			value = (!value.equals("")) ? value : PluginCommandDefaults.pluginSettingsString;
+		} catch (Exception e) 
 		{
-			if(itemStack != null && chestInventory.contains(itemStack.getType()))
-			{
-				HashMap<Integer, ItemStack> itemOverflow = chestInventory.addItem(itemStack);
-				if(itemOverflow.isEmpty())
-				{
-					playerInventory.remove(itemStack);
-				}
-				else if(debug)
-				{
-					player.sendMessage("item overflow");
-				}
-			}
+			e.printStackTrace();
 		}
+		return value;
+	}
+
+	public static String getPluginEnableQuickStackFlag(SettingType type) {
+		String value = PluginCommandDefaults.pluginEnableQuickStackFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, PluginCommandDefaults.pluginEnableQuickStackFlagKey, "=", null);
+			value = (!value.equals("")) ? value : PluginCommandDefaults.pluginEnableQuickStackFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getPluginEnableSelfDammageFlag(SettingType type) {
+		String value = PluginCommandDefaults.pluginEnableSelfDammageFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, PluginCommandDefaults.pluginEnableSelfDammageFlagKey, "=", null);
+			value = (!value.equals("")) ? value : PluginCommandDefaults.pluginEnableSelfDammageFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getPluginOptionsDelim(SettingType type) {
+		String value = PluginCommandDefaults.pluginOptionsDelim;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, PluginCommandDefaults.pluginOptionsDelimKey, "=", null);
+			value = (!value.equals("")) ? value : PluginCommandDefaults.pluginOptionsDelim;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getPluginHelpFlag(SettingType type) {
+		String value = PluginCommandDefaults.pluginHelpFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, PluginCommandDefaults.pluginHelpFlagKey, "=", null);
+			value = (!value.equals("")) ? value : PluginCommandDefaults.pluginHelpFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static boolean isEnableQuickStack(SettingType type) {
+		boolean value = PluginCommandDefaults.enableQuickStack;
+		try 
+		{
+			value = Boolean.parseBoolean(SettingsWriter.ReadSetting(type, PluginCommandDefaults.enableQuickStackKey, "=", null));
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static boolean isEnableSelfDammage(SettingType type) {
+		boolean value = PluginCommandDefaults.enableSelfDammage;
+		try 
+		{
+			value = Boolean.parseBoolean(SettingsWriter.ReadSetting(type, PluginCommandDefaults.enableSelfDammageKey, "=", null));
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getEnableQuickStackString(SettingType type) {
+		String value = QuickStackDefaults.enableQuickStackString;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.enableQuickStackStringKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.enableQuickStackString;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getEnableDebugFlag(SettingType type) {
+		String value = QuickStackDefaults.enableDebugFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.enableDebugFlagKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.enableDebugFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getxValueFlag(SettingType type) {
+		String value = QuickStackDefaults.xValueFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.xValueFlagKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.xValueFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getyValueFlag(SettingType type) {
+		String value = QuickStackDefaults.yValueFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.yValueFlagKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.yValueFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getzValueFlag(SettingType type) {
+		String value = QuickStackDefaults.zValueFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.zValueFlagKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.zValueFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getSideValueFlag(SettingType type) {
+		String value = QuickStackDefaults.sideValueFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.sideValueFlagKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.sideValueFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getValueFlagDelim(SettingType type) {
+		String value = QuickStackDefaults.valueFlagDelim;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.valueFlagDelimKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.valueFlagDelim;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static String getQuickStackHelpFlag(SettingType type) {
+		String value = QuickStackDefaults.quickStackHelpFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.quickStackHelpFlagKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.quickStackHelpFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static int getXsearchradiusdefault(SettingType type) {
+		int value = QuickStackDefaults.xSearchRadiusDefault;
+		try 
+		{
+			value = Integer.parseInt(SettingsWriter.ReadSetting(type, QuickStackDefaults.xSearchRadiusDefaultKey, "=", null));
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static int getYsearchradiusdefault(SettingType type) {
+		int value = QuickStackDefaults.ySearchRadiusDefault;
+		try 
+		{
+			value = Integer.parseInt(SettingsWriter.ReadSetting(type, QuickStackDefaults.ySearchRadiusDefaultKey, "=", null));
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static int getZsearchradiusdefault(SettingType type) {
+		int value = QuickStackDefaults.zSearchRadiusDefault;
+		try 
+		{
+			value = Integer.parseInt(SettingsWriter.ReadSetting(type, QuickStackDefaults.zSearchRadiusDefaultKey, "=", null));
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+
+	public static int getSearchradiusmax(SettingType type) {
+		int value = QuickStackDefaults.searchRadiusMax;
+		try 
+		{
+			value = Integer.parseInt(SettingsWriter.ReadSetting(type, QuickStackDefaults.searchRadiusMaxKey, "=", null));
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
 	}
 	
-	/*
-	 * Helper
-	 */
-	private void printQuickStackHelp(Player player)
+	public static void printPluginHelp(Player player)
 	{
-		player.sendMessage("WARNING: Exoerimental");
-		player.sendMessage("Usage: " + enableQuickStackString + "	(Run with default values)");
-		player.sendMessage("Usage: " + enableQuickStackString + " " + sideValueFlag + valueFlagDelim + "<int>" + "	(Run with cube side length a)");
-		player.sendMessage("Usage: " + enableQuickStackString + " " + xValueFlag + valueFlagDelim + "<int>" + " " + yValueFlag + valueFlagDelim + "<int>" + " " + zValueFlag + valueFlagDelim + "<int>" + "	(Run with custom side length x y z)");
-		player.sendMessage("MaxSearchRadius: " + searchRadiusMax);
-	}
-	
-	private String constructQuickStackUsageString()
-	{
-		return "Usage: " + enableQuickStackString + "	(Run with default values)" + '\n'
-				+ "Usage: " + enableQuickStackString + " " + sideValueFlag + valueFlagDelim + "<int>" + "	(Run with cube side length a)" + '\n' 
-				+ "Usage: " + enableQuickStackString + " " + xValueFlag + valueFlagDelim + "<int>" + " " + yValueFlag + valueFlagDelim + "<int>" + " " + zValueFlag + valueFlagDelim + "<int>" + "	(Run with custom side length x y z)";
-	}
-	
-	private void printPluginHelp(Player player)
-	{
-		player.sendMessage("Usage: " + pluginSettingsString + " " + pluginEnableQuickStackFlag + pluginOptionsDelim + "<boolean>");
+		/*
+		player.sendMessage("Usage: " + getPluginSettingsString(SettingType.PLUGINSETTINGS) + " " + getPluginEnableQuickStackFlag() + pluginOptionsDelim + "<boolean>");
 		player.sendMessage("Usage: " + pluginSettingsString + " " + pluginEnableSelfDammageFlag + pluginOptionsDelim + "<boolean>");
 		player.sendMessage("SelfDammage: " + enableSelfDammage);
 		player.sendMessage("QuickStack: " + enableQuickStack);
+		*/
+	}
+	
+	public static void printDebugInfo()
+	{
+		System.out.println(getPluginEnableQuickStackFlag(SettingType.PLUGINSETTINGS));
+		System.out.println(getPluginEnableSelfDammageFlag(SettingType.PLUGINSETTINGS));
+		System.out.println(getPluginHelpFlag(SettingType.PLUGINSETTINGS));
+		System.out.println(getPluginOptionsDelim(SettingType.PLUGINSETTINGS));
+		System.out.println(getPluginOptionsDelim(SettingType.PLUGINSETTINGS));
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println();
 	}
 }

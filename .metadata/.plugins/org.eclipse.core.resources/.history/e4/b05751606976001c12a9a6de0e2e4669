@@ -1,0 +1,361 @@
+package dev.nyr.main;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Spliterator;
+
+import javax.annotation.Nullable;
+
+public class SettingsWriter 
+{
+	private static final String printSignature = "[nyrmcplugin]@SettingsWriter: ";
+
+	public enum SettingType
+	{
+		QUICKSTACK, QUICKSTACK_PLAYER, SELFDAMMAGE, SELFDAMMAGE_PLAYER
+	}
+	
+	public enum WriteMode
+	{
+		OVERWRITE, APPEND
+	}
+	
+	/***
+	 * 
+	 * @param type
+	 * @param filename
+	 * @return <code>true</code> if file was created or <code>false</code> if file already existed
+	 * @throws Exception 
+	 */
+	public static boolean CreateSettingFile(SettingType type, String filename) throws Exception
+	{
+		try
+		{
+			String path;
+			switch(type)
+			{
+				case QUICKSTACK:
+					path = RequirementsCreator.FolderStructure.getQuickStackFolder();
+					break;
+				case QUICKSTACK_PLAYER:
+					path = RequirementsCreator.FolderStructure.getQuickStackPlayerFolder();
+					break;
+				case SELFDAMMAGE:
+					path = RequirementsCreator.FolderStructure.getSelfDammageFolder();
+					break;
+				case SELFDAMMAGE_PLAYER:
+					path = RequirementsCreator.FolderStructure.getSelfDammagePlayerFodler();
+					break;
+				default:
+					System.out.println(printSignature + "CreateSettingFile: type was not recognized");
+					throw new Exception(printSignature + "CreateSettingFile: type was not recognized");
+			}
+			File setting = new File(path + "\\" + filename);
+			if(setting.createNewFile())
+			{
+				System.out.println(printSignature + "Created " + filename + " @ " + path);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
+	public static void ChangeSetting(SettingType type, String key, String value, String delim, @Nullable String playerName) throws Exception
+	{
+		try
+		{
+			String path = "";
+			switch (type)
+			{
+				case QUICKSTACK:
+					path = RequirementsCreator.FolderStructure.getQuickStackSettingsPath();
+					break;
+				case QUICKSTACK_PLAYER:
+					if(playerName == null)
+					{
+						throw new IllegalArgumentException(printSignature + "ChangeSetting: playerName was null");
+					}
+					if(!playerName.endsWith(".txt"))
+					{
+						playerName += ".txt";
+					}
+					path = RequirementsCreator.FolderStructure.getQuickStackPlayerFolder() + "\\" + playerName;
+					break;
+				case SELFDAMMAGE:
+					path = RequirementsCreator.FolderStructure.getSelfDammageSettings();
+					break;
+				case SELFDAMMAGE_PLAYER:
+					if(playerName == null)
+					{
+						throw new IllegalArgumentException(printSignature + "ChangeSetting: playerName was null");
+					}
+					if(!playerName.endsWith(".txt"))
+					{
+						playerName += ".txt";
+					}
+					path = RequirementsCreator.FolderStructure.getSelfDammagePlayerFodler() + "\\" + playerName;
+					break;
+				default:
+					System.out.println(printSignature + "ChangeSetting: type was not recognized");
+					throw new Exception(printSignature + "ChangeSetting: type was not recognized");
+			}
+			File settingContainer = new File(path);
+			if(settingContainer.exists())
+			{
+				FileWriter writer = new FileWriter(settingContainer);
+				Scanner scanner = new Scanner(settingContainer);
+				String fileContent = "";
+				while(scanner.hasNext())
+				{
+					String line = scanner.next();
+					if(line.startsWith(key))
+					{
+						line = key + delim + value + "\n"; 
+					}
+					fileContent += line;
+				}
+				writer.write(fileContent);
+				scanner.close();
+				writer.close();
+			}
+			else
+			{
+				throw new FileNotFoundException(printSignature + "ChangeSetting: file not exist" + settingContainer.getName());
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
+	public static void AddSetting(SettingType type, String key, String value, @Nullable String other)
+	{
+		switch(type)
+		{
+			case QUICKSTACK:
+				break;
+			case QUICKSTACK_PLAYER:
+				break;
+			case SELFDAMMAGE:
+				break;
+			case SELFDAMMAGE_PLAYER:
+				break;
+			default:
+				break;
+		}
+	}
+	
+	public static String ReadSetting(SettingType type, String key, String delim, @Nullable String fileName) throws Exception
+	{
+		try
+		{
+			String path = "";
+			switch (type)
+			{
+				case QUICKSTACK:
+					path = RequirementsCreator.FolderStructure.getQuickStackSettingsPath();
+					break;
+				case QUICKSTACK_PLAYER:
+					if(fileName == null)
+					{
+						throw new IllegalArgumentException(printSignature + "ReadSetting: fileName was null");
+					}
+					if(!fileName.endsWith(".txt"))
+					{
+						fileName += ".txt";
+					}
+					path = RequirementsCreator.FolderStructure.getQuickStackPlayerFolder() + "\\" + fileName;
+					break;
+				case SELFDAMMAGE:
+					path = RequirementsCreator.FolderStructure.getSelfDammageSettings();
+					break;
+				case SELFDAMMAGE_PLAYER:
+					if(fileName == null)
+					{
+						throw new IllegalArgumentException(printSignature + "ReadSetting: fileName was null");
+					}
+					if(!fileName.endsWith(".txt"))
+					{
+						fileName += ".txt";
+					}
+					path = RequirementsCreator.FolderStructure.getSelfDammagePlayerFodler() + "\\" + fileName;
+					break;
+				default:
+					System.out.println(printSignature + "ReadSetting: type was not recognized");
+					throw new Exception(printSignature + "ReadSetting: type was not recognized");
+			}
+			File settingContainer = new File(path);
+			if(settingContainer.exists())
+			{
+				Scanner scanner = new Scanner(settingContainer);
+				String outValue = "";
+				while(scanner.hasNext())
+				{
+					String line = scanner.next();
+					if(line.startsWith(key + delim))
+					{
+						String[] keyValuePair = line.split(delim);
+						outValue = (keyValuePair.length >= 2) ? keyValuePair[1] : "";
+						break;
+					}
+				}
+				scanner.close();
+				return outValue;
+			}
+			else
+			{
+				throw new FileNotFoundException(printSignature + "ChangeSetting: file not exist" + settingContainer.getName());
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
+	public static String[] ReadFile(SettingType type, @Nullable String fileName) throws Exception
+	{
+		try
+		{
+			String path = "";
+			switch (type)
+			{
+				case QUICKSTACK:
+					path = RequirementsCreator.FolderStructure.getQuickStackSettingsPath();
+					break;
+				case QUICKSTACK_PLAYER:
+					if(fileName == null)
+					{
+						throw new IllegalArgumentException(printSignature + "ReadFile: fileName was null");
+					}
+					if(!fileName.endsWith(".txt"))
+					{
+						fileName += ".txt";
+					}
+					path = RequirementsCreator.FolderStructure.getQuickStackPlayerFolder() + "\\" + fileName;
+					break;
+				case SELFDAMMAGE:
+					path = RequirementsCreator.FolderStructure.getSelfDammageSettings();
+					break;
+				case SELFDAMMAGE_PLAYER:
+					if(fileName == null)
+					{
+						throw new IllegalArgumentException(printSignature + "ReadFile: fileName was null");
+					}
+					if(!fileName.endsWith(".txt"))
+					{
+						fileName += ".txt";
+					}
+					path = RequirementsCreator.FolderStructure.getSelfDammagePlayerFodler() + "\\" + fileName;
+					break;
+				default:
+					System.out.println(printSignature + "ReadFile: type was not recognized");
+					throw new Exception(printSignature + "ReadFile: type was not recognized");
+			}
+			File settingContainer = new File(path);
+			if(settingContainer.exists())
+			{
+				Scanner scanner = new Scanner(settingContainer);
+				List<String> outValueList = new ArrayList<>();
+				while(scanner.hasNext())
+				{
+					outValueList.add(scanner.next());
+				}
+				scanner.close();
+				return (String[]) outValueList.toArray(new String[outValueList.size()]);
+			}
+			else
+			{
+				throw new FileNotFoundException(printSignature + "ReadFile: file not exist" + settingContainer.getName());
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
+	public static void WriteFile(SettingType type, WriteMode mode, String[] input, @Nullable String fileName) throws Exception
+	{
+		try
+		{
+			String path = "";
+			switch (type)
+			{
+				case QUICKSTACK:
+					path = RequirementsCreator.FolderStructure.getQuickStackSettingsPath();
+					break;
+				case QUICKSTACK_PLAYER:
+					if(fileName == null)
+					{
+						throw new IllegalArgumentException(printSignature + "ReadFile: fileName was null");
+					}
+					if(!fileName.endsWith(".txt"))
+					{
+						fileName += ".txt";
+					}
+					path = RequirementsCreator.FolderStructure.getQuickStackPlayerFolder() + "\\" + fileName;
+					break;
+				case SELFDAMMAGE:
+					path = RequirementsCreator.FolderStructure.getSelfDammageSettings();
+					break;
+				case SELFDAMMAGE_PLAYER:
+					if(fileName == null)
+					{
+						throw new IllegalArgumentException(printSignature + "ReadFile: fileName was null");
+					}
+					if(!fileName.endsWith(".txt"))
+					{
+						fileName += ".txt";
+					}
+					path = RequirementsCreator.FolderStructure.getSelfDammagePlayerFodler() + "\\" + fileName;
+					break;
+				default:
+					System.out.println(printSignature + "ReadFile: type was not recognized");
+					throw new Exception(printSignature + "ReadFile: type was not recognized");
+			}
+			File settingContainer = new File(path);
+			if(settingContainer.exists())
+			{
+				FileWriter writer = new FileWriter(settingContainer);
+				String value = "";
+				for(String s : input)
+				{
+					value += s + "\n";
+				}
+				if(mode == WriteMode.APPEND)
+				{
+					writer.append(value);
+				}
+				else
+				{
+					writer.write(value);
+				}
+				writer.close();
+			}
+			else
+			{
+				throw new FileNotFoundException(printSignature + "ReadFile: file not exist" + settingContainer.getName());
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+	}
+}

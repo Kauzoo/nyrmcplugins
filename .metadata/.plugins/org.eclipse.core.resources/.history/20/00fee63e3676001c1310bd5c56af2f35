@@ -1,0 +1,44 @@
+/**
+ * 
+ */
+package dev.nyr.main;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+/**
+ * @author janme
+ *
+ */
+public class testing {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		this.ParseFile();
+	}
+	
+    private void ParseFile()
+    {
+    	try
+    	{
+    		File file = new File("test.txt");
+    		Scanner myReader = new Scanner(file);
+    		while(myReader.hasNextLine())
+    		{
+    			String data = myReader.nextLine();
+    			System.out.println(data);
+    		}
+    		myReader.close();
+    	}
+    	catch(FileNotFoundException e)
+    	{
+    		System.out.println("funktioniert nicht");
+    		e.printStackTrace();
+    	}
+    }
+
+}

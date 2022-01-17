@@ -83,6 +83,8 @@ public class UsefullListener implements Listener
 		public static final String yValueFlag = "-y";
 		public static final String zValueFlag = "-z";
 		public static final String sideValueFlag = "-a";
+		public static final String addExclusionFlag = "-add";
+		public static final String removeExclusionFlag = "-rem";
 		public static final String valueFlagDelim = ":";
 		public static final String quickStackHelpFlag = "-help";
 		public static final int xSearchRadiusDefault = 10;
@@ -97,6 +99,8 @@ public class UsefullListener implements Listener
 		public static final String yValueFlagKey = "yValueFlag";
 		public static final String zValueFlagKey = "zValueFlag";
 		public static final String sideValueFlagKey = "sideValueFlag";
+		public static final String addExclusionFlagKey = "addQuickStackExclusion";
+		public static final String removeExclusionFlagKey = "removeQuickStackExclusion";
 		public static final String valueFlagDelimKey = "valueFlagDelim";
 		public static final String quickStackHelpFlagKey = "quickStackHelpFlag";
 		public static final String xSearchRadiusDefaultKey = "xSearchRadiusDefault";
@@ -113,10 +117,9 @@ public class UsefullListener implements Listener
 	public void onPlayerJoinEvent(PlayerJoinEvent event)
 	{
 		Player player = event.getPlayer();
-		System.out.println("hot swap works");
 		player.sendMessage("Server is using nyrmcplugin test build");
 		player.sendMessage("Status: SelfDammage:" + isEnableSelfDammage(SettingType.PLUGINSETTINGS) + " QuickStack:" + isEnableQuickStack(SettingType.PLUGINSETTINGS));
-		player.sendMessage("WARNING: Exoerimental");
+		player.sendMessage("WARNING: Experimental");
 		player.sendMessage("To learn more about QuickStack use: " + getEnableQuickStackString(SettingType.PLUGINSETTINGS) + " " + getQuickStackHelpFlag(SettingType.PLUGINSETTINGS));
 		if(player.isOp())
 		{
@@ -171,12 +174,10 @@ public class UsefullListener implements Listener
 		 */
 		if(playerChatEvent.getPlayer().isOp() && !message.isEmpty() && message.get(0).startsWith(getPluginSettingsString(SettingType.PLUGINSETTINGS)))
 		{
-			System.out.println("test");
 			for(String s : message)
 			{
 				if(s.startsWith(getPluginEnableQuickStackFlag(SettingType.PLUGINSETTINGS)))
 				{
-					System.out.println("anderer test");
 					try
 					{
 						 SettingsWriter.ChangeSetting(SettingType.PLUGINSETTINGS, PluginCommandDefaults.enableQuickStackKey, s.split(getPluginOptionsDelim(SettingType.PLUGINSETTINGS))[1], "=", null);
@@ -307,6 +308,7 @@ public class UsefullListener implements Listener
 				{
 					debugFlag = true;
 				}
+				playerChatEvent.setCancelled(true);
 			}
 			QuickStackCore.lookForChests(playerChatEvent.getPlayer(), xSearchRadius, ySearchRadius, zSearchRadius, debugFlag);
 		}
@@ -559,14 +561,17 @@ public class UsefullListener implements Listener
 	
 	public static void printPluginHelp(Player player)
 	{
-		/*
-		player.sendMessage("Usage: " + getPluginSettingsString(SettingType.PLUGINSETTINGS) + " " + getPluginEnableQuickStackFlag() + pluginOptionsDelim + "<boolean>");
-		player.sendMessage("Usage: " + pluginSettingsString + " " + pluginEnableSelfDammageFlag + pluginOptionsDelim + "<boolean>");
-		player.sendMessage("SelfDammage: " + enableSelfDammage);
-		player.sendMessage("QuickStack: " + enableQuickStack);
-		*/
+		String delim = getPluginOptionsDelim(SettingType.PLUGINSETTINGS);
+		String pluginSetting = getPluginSettingsString(SettingType.PLUGINSETTINGS);
+		player.sendMessage("Usage: " + pluginSetting + " " + getPluginEnableQuickStackFlag(SettingType.PLUGINSETTINGS) + delim + "<boolean>");
+		player.sendMessage("Usage: " + pluginSetting + " " + getPluginEnableSelfDammageFlag(SettingType.PLUGINSETTINGS) + delim + "<boolean>");
+		player.sendMessage("SelfDammage: " + isEnableSelfDammage(SettingType.PLUGINSETTINGS));
+		player.sendMessage("QuickStack: " + isEnableQuickStack(SettingType.PLUGINSETTINGS));
 	}
 	
+	/***
+	 * DEBUG ONLY
+	 */
 	public static void printDebugInfo()
 	{
 		System.out.println(getPluginEnableQuickStackFlag(SettingType.PLUGINSETTINGS));

@@ -14,52 +14,57 @@ import org.bukkit.inventory.ItemStack;
 
 import dev.nyr.main.SettingsWriter.SettingType;
 
-public class QuickStackCore 
+public class QuickStackCore
 {
 
 	/*
 	 * Handles looking for chests
 	 */
-	public static void lookForChests(Player player, int xSearchRadius, int ySearchRadius, int zSearchRadius, boolean debug)
+	public static void lookForChests(Player player, int xSearchRadius, int ySearchRadius, int zSearchRadius,
+			boolean debug)
 	{
 		player.sendMessage("Searching for chests in your area");
-		int[] positionVector = { player.getLocation().getBlockX(), player.getLocation().getBlockY(), player.getLocation().getBlockZ() };
-		player.sendMessage("Using position " + "(" + positionVector[0] + "|" + positionVector[1] + "|" + positionVector[2] + ")");
-		player.sendMessage("Using SideLength X:" + xSearchRadius * 2 + " Y:" + ySearchRadius * 2 + " Z:" + zSearchRadius * 2);
-		
+		int[] positionVector = { player.getLocation().getBlockX(), player.getLocation().getBlockY(),
+				player.getLocation().getBlockZ() };
+		player.sendMessage(
+				"Using position " + "(" + positionVector[0] + "|" + positionVector[1] + "|" + positionVector[2] + ")");
+		player.sendMessage(
+				"Using SideLength X:" + xSearchRadius * 2 + " Y:" + ySearchRadius * 2 + " Z:" + zSearchRadius * 2);
+
 		// Try parse exclude list
 		List<String> excludeList = new ArrayList<>();
-		try 
+		try
 		{
-			List<String> excludeListUnparsed = SettingsWriter.ReadFile(SettingType.QUICKSTACK_PLAYER, player.getDisplayName());
-			for(String s : excludeListUnparsed)
+			List<String> excludeListUnparsed = SettingsWriter.ReadFile(SettingType.QUICKSTACK_PLAYER,
+					player.getDisplayName());
+			for (String s : excludeListUnparsed)
 			{
 				excludeList.add(s.split("=")[1]);
 			}
-		} 
-		catch (Exception e) 
+		} catch (Exception e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		// x-Loop
-		for(int i = positionVector[0] - xSearchRadius; i < positionVector[0] + xSearchRadius; i++)
+		for (int i = positionVector[0] - xSearchRadius; i < positionVector[0] + xSearchRadius; i++)
 		{
 			// y-Loop
-			for(int j = positionVector[1] - ySearchRadius; j < positionVector[1] + ySearchRadius; j++)
+			for (int j = positionVector[1] - ySearchRadius; j < positionVector[1] + ySearchRadius; j++)
 			{
 				// z-Loop
-				for(int k = positionVector[2] - zSearchRadius; k < positionVector[2] + zSearchRadius; k++)
+				for (int k = positionVector[2] - zSearchRadius; k < positionVector[2] + zSearchRadius; k++)
 				{
 					Block block = new Location(player.getWorld(), i, j, k).getBlock();
-					if(debug)
+					if (debug)
 					{
-						player.sendMessage("Looking for block @ (" + i + "|" + j + "|" + k + ") Block was " + block.getType().toString());
+						player.sendMessage("Looking for block @ (" + i + "|" + j + "|" + k + ") Block was "
+								+ block.getType().toString());
 					}
-					if(block.getType() == Material.CHEST)
+					if (block.getType() == Material.CHEST)
 					{
-						if(debug)
+						if (debug)
 						{
 							player.sendMessage("Chest detected @ (" + i + "|" + j + "|" + k + ")");
 							System.out.println("Chest detected @ (" + i + "|" + j + "|" + k + ")");
@@ -70,7 +75,7 @@ public class QuickStackCore
 			}
 		}
 	}
-	
+
 	/*
 	 * Quickstacks to a chest
 	 */
@@ -78,74 +83,82 @@ public class QuickStackCore
 	{
 		Inventory chestInventory = chest.getInventory();
 		Inventory playerInventory = player.getInventory();
-		
-		try 
+
+		try
 		{
-			
-			
-			for(ItemStack itemStack : playerInventory.getStorageContents())
+
+			for (ItemStack itemStack : playerInventory.getStorageContents())
 			{
-				if(itemStack != null && chest.getInventory().contains(itemStack.getType()) && !excludeList.contains(itemStack.getType().toString()))
+				if (itemStack != null && chest.getInventory().contains(itemStack.getType())
+						&& !excludeList.contains(itemStack.getType().toString()))
 				{
 					HashMap<Integer, ItemStack> itemOverflow = chestInventory.addItem(itemStack);
-					if(itemOverflow.isEmpty())
+					if (itemOverflow.isEmpty())
 					{
 						playerInventory.remove(itemStack);
-					}
-					else if(debug)
+					} else if (debug)
 					{
 						player.sendMessage("item overflow");
 					}
 				}
 			}
-			
-		} catch (Exception e) 
+
+		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public static void AddQuickStackExclude(SettingType type, Player player)
 	{
-		if(player.getItemInHand() != null)
+		if (player.getItemInHand() != null)
 		{
 			try
 			{
-				SettingsWriter.AddSetting(type, UsefullListener.QuickStackDefaults.quickStackExludeKey, player.getItemInHand().getType().toString(), "=", player.getDisplayName());
-			}
-			catch (Exception e)
+				SettingsWriter.AddSetting(type, UsefullListener.QuickStackDefaults.quickStackExludeKey,
+						player.getItemInHand().getType().toString(), "=", player.getDisplayName());
+			} catch (Exception e)
 			{
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	public static void RemoveQuickStackExcludeForPlayer(SettingType type, Player player)
 	{
-		if(player.getItemInHand() != null)
+		if (player.getItemInHand() != null)
 		{
 			try
 			{
-				SettingsWriter.RemoveSetting(type, UsefullListener.QuickStackDefaults.quickStackExludeKey + "=" + player.getItemInHand().getType().toString(), player.getDisplayName());
-			}
-			catch (Exception e)
+				SettingsWriter.RemoveSetting(type, UsefullListener.QuickStackDefaults.quickStackExludeKey + "="
+						+ player.getItemInHand().getType().toString(), player.getDisplayName());
+			} catch (Exception e)
 			{
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	/*
 	 * Helper
 	 */
 	public static void printQuickStackHelp(Player player)
 	{
-		player.sendMessage("WARNING: Exoerimental");
-		player.sendMessage("Usage: " + UsefullListener.getEnableQuickStackString(SettingType.QUICKSTACK) + "	(Run with default values)");
-		player.sendMessage("Usage: " + UsefullListener.getEnableQuickStackString(SettingType.QUICKSTACK) + " " + UsefullListener.getSideValueFlag(SettingType.QUICKSTACK) + UsefullListener.getValueFlagDelim(SettingType.QUICKSTACK) + "<int>" + "	(Run with cube side length a)");
-		//player.sendMessage("Usage: " + UsefullListener.getEnableQuickStackString(SettingType.QUICKSTACK) + " " + xValueFlag + valueFlagDelim + "<int>" + " " + yValueFlag + valueFlagDelim + "<int>" + " " + zValueFlag + valueFlagDelim + "<int>" + "	(Run with custom side length x y z)");
-		//player.sendMessage("MaxSearchRadius: " + searchRadiusMax);
+		String delim = UsefullListener.getValueFlagDelim(SettingType.QUICKSTACK);
+		String enableQuickStack = UsefullListener.getEnableQuickStackString(SettingType.QUICKSTACK);
+		player.sendMessage("WARNING: Experimental");
+		player.sendMessage("Usage: " + enableQuickStack + "	(Run with default values)");
+		player.sendMessage("Usage: " + enableQuickStack + " " + UsefullListener.getSideValueFlag(SettingType.QUICKSTACK)
+				+ delim + "<int>" + "	(Run with cube side length a)");
+		player.sendMessage("Usage: " + enableQuickStack + " " + UsefullListener.getxValueFlag(SettingType.QUICKSTACK)
+				+ delim + "<int>" + " " + UsefullListener.getyValueFlag(SettingType.QUICKSTACK) + delim + "<int>" + " "
+				+ UsefullListener.getzValueFlag(SettingType.QUICKSTACK) + delim + "<int>"
+				+ "	(Run with custom side length x y z)");
+		player.sendMessage("MaxSearchRadius: " + UsefullListener.getSearchradiusmax(SettingType.QUICKSTACK));
+		player.sendMessage("XDefault: " + UsefullListener.getXsearchradiusdefault(SettingType.QUICKSTACK));
+		player.sendMessage("YDefault: " + UsefullListener.getYsearchradiusdefault(SettingType.QUICKSTACK));
+		player.sendMessage("ZDefault: " + UsefullListener.getZsearchradiusdefault(SettingType.QUICKSTACK));
 	}
 }

@@ -9,13 +9,13 @@ public class RequirementsCreator
 	public class FolderStructure
     {
     	public static final String parentFolder = "nyrmcplugin";
-    	public static final String pluginSettings = "\\nyrmcplugin-settings.txt";
-    	public static final String quickStackFolder = "\\quickstack";
-    	public static final String selfDammageFolder = "\\selfdammage";
-    	public static final String quickStackSettings = "\\quickstack-settings.txt";
-    	public static final String selfDammageSettings = "\\selfdammage-settings.txt";
-    	public static final String quickStackPlayerFolder = "\\players";
-    	public static final String selfDammagePlayerFolder = "\\players";
+    	public static final String pluginSettings = File.separator + "nyrmcplugin-settings.txt";
+    	public static final String quickStackFolder = File.separator + "quickstack";
+    	public static final String selfDammageFolder = File.separator + "selfdammage";
+    	public static final String quickStackSettings = File.separator + "quickstack-settings.txt";
+    	public static final String selfDammageSettings = File.separator + "selfdammage-settings.txt";
+    	public static final String quickStackPlayerFolder = File.separator + "players";
+    	public static final String selfDammagePlayerFolder = File.separator + "players";
     	
     	public static String getQuickStackSettingsPath()
     	{

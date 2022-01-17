@@ -1,4 +1,5 @@
 # nyrmcplugins
+ WARNING: WIP & UGLY CODE
  
 TEST BUILD
 Minecraft Plugin for SelfDammage and QuickStack.

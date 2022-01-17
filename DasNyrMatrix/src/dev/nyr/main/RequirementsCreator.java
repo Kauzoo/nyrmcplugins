@@ -2,10 +2,14 @@ package dev.nyr.main;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.List;
+
+import org.bukkit.entity.Player;
+
+import dev.nyr.main.SettingsWriter.SettingType;
 
 public class RequirementsCreator 
 {
-
 	public class FolderStructure
     {
     	public static final String parentFolder = "nyrmcplugin";
@@ -16,6 +20,7 @@ public class RequirementsCreator
     	public static final String selfDammageSettings = File.separator + "selfdammage-settings.txt";
     	public static final String quickStackPlayerFolder = File.separator + "players";
     	public static final String selfDammagePlayerFolder = File.separator + "players";
+    	public static final String quickStackExcludes = File.separator + "quickstack-default-excludes.txt";
     	
     	public static String getQuickStackSettingsPath()
     	{
@@ -50,6 +55,11 @@ public class RequirementsCreator
     	public static String getPluginSettings()
     	{
     		return parentFolder + pluginSettings;
+    	}
+    	
+    	public static String getQuickStackExcludes()
+    	{
+    		return parentFolder + quickStackFolder + quickStackExcludes;
     	}
     }
 	
@@ -104,6 +114,14 @@ public class RequirementsCreator
         			File selfDammageSettings = new File(selfDammageFolder.getAbsolutePath() + FolderStructure.selfDammageSettings);
     				System.out.println((quickStackSettings.createNewFile()) ? "[nyrmcplugin]: Created file " + quickStackSettings.getName() : "[nyrmcplugin]: Failed to create file " + quickStackSettings.getName());
     				System.out.println((selfDammageSettings.createNewFile()) ? "[nyrmcplugin]: Created file " + selfDammageSettings.getName() : "[nyrmcplugin]: Failed to create file " + selfDammageSettings.getName());
+    				
+    				// Try create default quickstack exclude
+    				File quickStackExcludes = new File(quickStackFolder.getAbsolutePath() + FolderStructure.quickStackExcludes);
+    				System.out.println((quickStackExcludes.createNewFile()) ? "[nyrmcplugin]: Created file " + quickStackExcludes.getName() : "[nyrmcplugins]: Failed to create file " + quickStackExcludes.getName());
+    				
+    				// Initialize quickstackexcludes
+    				InitializeQuickStackExclude(quickStackExcludes);
+    				
     				// Initialize quickstack settings
     				InitializeQuickStackSettings(quickStackSettings);
     				System.out.println("[nyrmcplugin]: Initialized " + quickStackSettings.getName());
@@ -178,5 +196,40 @@ public class RequirementsCreator
     	{
     		e.printStackTrace();
     	}
+    }
+    
+    /***
+     * 
+     */
+    private static void InitializeQuickStackExclude(File file)
+    {
+    	String fullContent = "";
+    	for(String s : MinecraftDataContainer.ToolArmor.getToolArmorList())
+    	{
+    		fullContent += UsefullListener.QuickStackDefaults.quickStackExludeKey + "=" + s + "\n";
+    	}
+    	try
+    	{
+    		FileWriter writer = new FileWriter(file);
+    		writer.write(fullContent);
+    		writer.close();
+    	}
+    	catch (Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+    
+    public static void InitializePlayerQuickStackExclude(Player player)
+    {
+    	try
+		{
+			List<String> excludes = SettingsWriter.ReadFile(SettingType.QUICKSTACK_EXCLUDES, null);
+			SettingsWriter.WriteFile(SettingType.QUICKSTACK_PLAYER, false, (String[]) excludes.toArray(new String[excludes.size()]), player.getDisplayName());
+		} catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }

@@ -13,7 +13,7 @@ public class SettingsWriter
 
 	public enum SettingType
 	{
-		QUICKSTACK, QUICKSTACK_PLAYER, SELFDAMMAGE, SELFDAMMAGE_PLAYER, PLUGINSETTINGS
+		QUICKSTACK, QUICKSTACK_PLAYER, SELFDAMMAGE, SELFDAMMAGE_PLAYER, PLUGINSETTINGS, QUICKSTACK_EXCLUDES
 	}
 
 	/***
@@ -286,7 +286,7 @@ public class SettingsWriter
 				{
 					value += s + "\n";
 				}
-				writer.append(value);
+				writer.write(value);
 				writer.close();
 			} else
 			{
@@ -337,6 +337,8 @@ public class SettingsWriter
 				return RequirementsCreator.FolderStructure.getSelfDammagePlayerFodler() + File.separator + fileName;
 			case PLUGINSETTINGS:
 				return RequirementsCreator.FolderStructure.getPluginSettings();
+			case QUICKSTACK_EXCLUDES:
+				return RequirementsCreator.FolderStructure.getQuickStackExcludes();
 			default:
 				throw new Exception(printSignature + methodIdentifier + " type was not recognized");
 			}

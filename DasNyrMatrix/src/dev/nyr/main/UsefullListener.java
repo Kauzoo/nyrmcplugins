@@ -129,6 +129,7 @@ public class UsefullListener implements Listener
 		{
 			SettingsWriter.CreateSettingFile(SettingType.QUICKSTACK_PLAYER, player.getDisplayName());
 			SettingsWriter.CreateSettingFile(SettingType.SELFDAMMAGE_PLAYER, player.getDisplayName());
+			RequirementsCreator.InitializePlayerQuickStackExclude(player);
 		}
 		catch (Exception e)
 		{

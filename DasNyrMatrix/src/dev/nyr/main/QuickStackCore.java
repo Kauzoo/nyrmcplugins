@@ -109,10 +109,31 @@ public class QuickStackCore
 		}
 	}
 
+	public static List<String> ParseExcludeList(Player player)
+	{
+		// Try parse exclude list
+		List<String> excludeList = new ArrayList<>();
+		try
+		{
+			List<String> excludeListUnparsed = SettingsWriter.ReadFile(SettingType.QUICKSTACK_PLAYER,
+					player.getDisplayName());
+			for (String s : excludeListUnparsed)
+			{
+				excludeList.add(s.split("=")[1]);
+			}
+			return excludeList;
+		} catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return excludeList;
+		}
+	}
+
 	@SuppressWarnings("deprecation")
 	public static void AddQuickStackExclude(SettingType type, Player player)
 	{
-		if (player.getItemInHand() != null)
+		if (player.getItemInHand() != null && !ParseExcludeList(player).contains(player.getItemInHand().getType().toString()))
 		{
 			try
 			{
@@ -128,7 +149,7 @@ public class QuickStackCore
 	@SuppressWarnings("deprecation")
 	public static void RemoveQuickStackExcludeForPlayer(SettingType type, Player player)
 	{
-		if (player.getItemInHand() != null)
+		if (player.getItemInHand() != null && ParseExcludeList(player).contains(player.getItemInHand().getType().toString()))
 		{
 			try
 			{

@@ -34,7 +34,7 @@ public class MinecraftDataContainer
 	
 	/***
 	 * 
-	 * @author janme
+	 * @author nyr
 	 *
 	 * Temporary Tool Container
 	 */
@@ -60,7 +60,7 @@ public class MinecraftDataContainer
 	
 	/***
 	 * 
-	 * @author janme
+	 * @author nyr
 	 * 
 	 * Temporary Armor Container
 	 */

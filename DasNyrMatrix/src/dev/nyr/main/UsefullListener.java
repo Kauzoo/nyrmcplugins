@@ -153,7 +153,7 @@ public class UsefullListener implements Listener
 				event.setDamage(0);
 				Player player = (Player) event.getDamager();
 				player.damage(damageDealt);
-				player.sendMessage("Ich hab mich grade für " + damageDealt + "geboxt");
+				player.sendMessage("Stop hitting yourself");
 			}
 		}
 	}
@@ -166,10 +166,10 @@ public class UsefullListener implements Listener
 	@EventHandler
 	public void parseChatMessage(PlayerChatEvent playerChatEvent)
 	{
-		System.out.println("test " + getPluginSettingsString(SettingType.PLUGINSETTINGS));
 		Player player = playerChatEvent.getPlayer();
 		String inputString = playerChatEvent.getMessage();
 		List<String> message = Arrays.asList(inputString.split(" "));
+		playerChatEvent.setCancelled(true);
 		/*
 		 * Parse message for plugin settings
 		 */
@@ -211,6 +211,11 @@ public class UsefullListener implements Listener
 				{
 					printPluginHelp(player);
 				}
+				if(s.equals("-reset"))
+				{
+					RequirementsCreator r = new RequirementsCreator();
+					r.HardResetRequirements();
+				}
 			}
 			playerChatEvent.setCancelled(true);
 		}
@@ -236,9 +241,14 @@ public class UsefullListener implements Listener
 				{
 					return;
 				}
-				if(s.startsWith("-add"))
+				if(s.startsWith(getAddExclusionFlag(SettingType.QUICKSTACK)))
 				{
 					QuickStackCore.AddQuickStackExclude(SettingType.QUICKSTACK_PLAYER, player);
+					return;
+				}
+				if(s.startsWith(getRemoveExclusionFlag(SettingType.QUICKSTACK)))
+				{
+					QuickStackCore.RemoveQuickStackExcludeForPlayer(SettingType.QUICKSTACK_PLAYER, player);
 					return;
 				}
 				if(s.startsWith(getSideValueFlag(SettingType.QUICKSTACK)))
@@ -309,7 +319,6 @@ public class UsefullListener implements Listener
 				{
 					debugFlag = true;
 				}
-				playerChatEvent.setCancelled(true);
 			}
 			QuickStackCore.lookForChests(playerChatEvent.getPlayer(), xSearchRadius, ySearchRadius, zSearchRadius, debugFlag);
 		}
@@ -560,6 +569,34 @@ public class UsefullListener implements Listener
 		return value;
 	}
 	
+	public static String getAddExclusionFlag(SettingType type)
+	{
+		String value = QuickStackDefaults.addExclusionFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.addExclusionFlagKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.addExclusionFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+	
+	public static String getRemoveExclusionFlag(SettingType type)
+	{
+		String value = QuickStackDefaults.removeExclusionFlag;
+		try 
+		{
+			value = SettingsWriter.ReadSetting(type, QuickStackDefaults.removeExclusionFlagKey, "=", null);
+			value = (!value.equals("")) ? value : QuickStackDefaults.removeExclusionFlag;
+		} catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return value;
+	}
+	
 	public static void printPluginHelp(Player player)
 	{
 		String delim = getPluginOptionsDelim(SettingType.PLUGINSETTINGS);
@@ -569,6 +606,7 @@ public class UsefullListener implements Listener
 		player.sendMessage("SelfDammage: " + isEnableSelfDammage(SettingType.PLUGINSETTINGS));
 		player.sendMessage("QuickStack: " + isEnableQuickStack(SettingType.PLUGINSETTINGS));
 	}
+	
 	
 	/***
 	 * DEBUG ONLY

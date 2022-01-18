@@ -3,6 +3,8 @@ package dev.nyr.main;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.List;
+import java.nio.*;
+import java.nio.file.FileSystem;
 
 import org.bukkit.entity.Player;
 
@@ -10,6 +12,21 @@ import dev.nyr.main.SettingsWriter.SettingType;
 
 public class RequirementsCreator 
 {
+	private static final String printSignature = "[nyrmcplugin]: ";
+	private static final String fileCreationPrint = "File created: ";
+	private static final String fileExistPrint = "File exists: ";
+	
+	private File nyrmcpluginFolder = new File(FolderStructure.parentFolder);
+	private File quickStackFolder = new File(FolderStructure.getQuickStackFolder());
+	private File selfDammageFolder = new File(FolderStructure.getSelfDammageFolder());
+	private File nyrmcpluginSettings = new File(FolderStructure.getPluginSettings());
+	private File quickStackSettings = new File(FolderStructure.getQuickStackSettingsPath());
+	private File selfDammageSettings = new File(FolderStructure.getSelfDammageSettings());
+	private File quickStackPlayerFolder = new File(FolderStructure.getQuickStackPlayerFolder());
+	private File selfDammagePlayerFolder = new File(FolderStructure.getSelfDammagePlayerFolder());
+	private File quickStackExcludes = new File(FolderStructure.getQuickStackExcludes());
+	
+	
 	public class FolderStructure
     {
     	public static final String parentFolder = "nyrmcplugin";
@@ -37,7 +54,7 @@ public class RequirementsCreator
     		return parentFolder + quickStackFolder + quickStackPlayerFolder;
     	}
     	
-    	public static String getSelfDammagePlayerFodler()
+    	public static String getSelfDammagePlayerFolder()
     	{
     		return parentFolder + selfDammageFolder + selfDammagePlayerFolder;
     	}
@@ -63,86 +80,87 @@ public class RequirementsCreator
     	}
     }
 	
-    public static void CreateRequirements()
+	public RequirementsCreator()
+	{
+		
+	}
+	
+    public void CreateRequirements()
     {
-    	// Try creating relevant directories
+    	System.out.println(printSignature + "Creating Requirements");
+    	// Try creating relevant directories and files
     	try
     	{
-    		// Try create nyrmcplugin parent folder
-    		File nyrmcpluginFolder = new File(FolderStructure.parentFolder);
-    		if(nyrmcpluginFolder.exists())
-    		{
-    			System.out.println("[nyrmcplugin]: Folder exists " + nyrmcpluginFolder.getName());
-    			// Check if all relevant Folders exist
-    			File nyrmcpluginSettings = new File(FolderStructure.parentFolder + FolderStructure.pluginSettings);
-    			File quickStackSettings = new File(FolderStructure.parentFolder + FolderStructure.quickStackSettings);
-    			File selfDammageSettings = new File(FolderStructure.parentFolder + FolderStructure.selfDammageSettings);
-    			File quickStackFolder = new File(FolderStructure.parentFolder + FolderStructure.quickStackFolder);
-    			File selfDammageFolder = new File(FolderStructure.parentFolder + FolderStructure.selfDammageFolder);
-    			File quickStackPlayerFolder = new File(FolderStructure.parentFolder + FolderStructure.quickStackPlayerFolder);
-    			File selfDammagePlayerFolder = new File(FolderStructure.parentFolder + FolderStructure.selfDammagePlayerFolder);
-    			
-    			System.out.println((quickStackSettings.exists()) ? "[nyrmcplugin]: File exists: " + FolderStructure.quickStackSettings : "[nyrmcplugin]: File not exists " + FolderStructure.quickStackSettings);
-    			System.out.println((selfDammageSettings.exists()) ? "[nyrmcplugin]: File exists: " + FolderStructure.selfDammageSettings : "[nyrmcplugin]: File not exists " + FolderStructure.selfDammageSettings);
-    			System.out.println((quickStackFolder.exists()) ? "[nyrmcplugin]: File exists: " + FolderStructure.quickStackFolder : "[nyrmcplugin]: File not exists " + FolderStructure.quickStackFolder);
-    			System.out.println((selfDammageFolder.exists()) ? "[nyrmcplugin]: File exists: " + FolderStructure.selfDammageFolder : "[nyrmcplugin]: File not exists " + FolderStructure.selfDammageFolder);
-    			System.out.println((quickStackPlayerFolder.exists()) ? "[nyrmcplugin]: File exists: " + FolderStructure.quickStackPlayerFolder : "[nyrmcplugin]: File not exists " + FolderStructure.quickStackPlayerFolder);
-    			System.out.println((selfDammagePlayerFolder.exists()) ? "[nyrmcplugin]: File exists: " + FolderStructure.selfDammagePlayerFolder : "[nyrmcplugin]: File not exists " + FolderStructure.selfDammagePlayerFolder);
-    			System.out.println("[nyrmcplugin]: If something stops working delete parent folder.");
-    		}
-    		else if(nyrmcpluginFolder.mkdir())
-    		{
-    			System.out.println("[nyrmcplugin]: Created folder " + nyrmcpluginFolder.getName());
-    			
-    			// Try create nyrmcplugin-settings file
-    			File nyrmcpluginSettings = new File(nyrmcpluginFolder.getAbsolutePath() + FolderStructure.pluginSettings);
-    			System.out.println((nyrmcpluginSettings.createNewFile()) ? "[nyrmcplugin]: Created file " + nyrmcpluginSettings.getName() : "[nyrmcplugin]: Failed to create file " + nyrmcpluginSettings.getName());
-    			// Initialize PluginSettings
-    			InitializePluginSettings(nyrmcpluginSettings);
-    			System.out.println("[nyrmcplugin]: Initialized " + nyrmcpluginSettings.getName());
-    			
-    			// Try create quickstack and selfdammage subfolder
-    			File quickStackFolder = new File(nyrmcpluginFolder.getAbsolutePath() + FolderStructure.quickStackFolder);
-    			File selfDammageFolder = new File(nyrmcpluginFolder.getAbsolutePath() + FolderStructure.selfDammageFolder);
-    			if(quickStackFolder.mkdir() && selfDammageFolder.mkdir())
-    			{
-    				System.out.println("[nyrmcplugin]: Created folder " + selfDammageFolder.getName());
-    				System.out.println("[nyrmcplugin]: Created folder " + quickStackFolder.getName());
-    				
-    				// Try create quickstack-settings and selfdammage-settings
-    				File quickStackSettings = new File(quickStackFolder.getAbsolutePath() + FolderStructure.quickStackSettings);
-        			File selfDammageSettings = new File(selfDammageFolder.getAbsolutePath() + FolderStructure.selfDammageSettings);
-    				System.out.println((quickStackSettings.createNewFile()) ? "[nyrmcplugin]: Created file " + quickStackSettings.getName() : "[nyrmcplugin]: Failed to create file " + quickStackSettings.getName());
-    				System.out.println((selfDammageSettings.createNewFile()) ? "[nyrmcplugin]: Created file " + selfDammageSettings.getName() : "[nyrmcplugin]: Failed to create file " + selfDammageSettings.getName());
-    				
-    				// Try create default quickstack exclude
-    				File quickStackExcludes = new File(quickStackFolder.getAbsolutePath() + FolderStructure.quickStackExcludes);
-    				System.out.println((quickStackExcludes.createNewFile()) ? "[nyrmcplugin]: Created file " + quickStackExcludes.getName() : "[nyrmcplugins]: Failed to create file " + quickStackExcludes.getName());
-    				
-    				// Initialize quickstackexcludes
-    				InitializeQuickStackExclude(quickStackExcludes);
-    				
-    				// Initialize quickstack settings
-    				InitializeQuickStackSettings(quickStackSettings);
-    				System.out.println("[nyrmcplugin]: Initialized " + quickStackSettings.getName());
-    				
-    				
-    				// Try create players folder
-    				File quickStackPlayerFolder = new File(quickStackFolder.getAbsolutePath() + FolderStructure.quickStackPlayerFolder);
-    				File selfDammagePlayerFolder = new File(selfDammageFolder.getAbsolutePath() + FolderStructure.selfDammagePlayerFolder);
-    				System.out.println((quickStackPlayerFolder.mkdir()) ? "[nyrmcplugin]: Created folder " + quickStackPlayerFolder.getName() : "[nyrmcplugin]: Failed to create file " + quickStackPlayerFolder.getName());
-    				System.out.println((selfDammagePlayerFolder.mkdir()) ? "[nyrmcplugin]: Created folder " + selfDammagePlayerFolder.getName() : "[nyrmcplugin]: Failed to create file " + selfDammagePlayerFolder.getName());
-    			}
-    		}
+			// Create Files
+			System.out.println((nyrmcpluginFolder.createNewFile()) ? printSignature + fileCreationPrint + nyrmcpluginFolder.getName() : printSignature + fileExistPrint + nyrmcpluginFolder.getName());
+			System.out.println((quickStackFolder.createNewFile()) ? printSignature + fileCreationPrint + quickStackFolder.getName() : printSignature + fileExistPrint + quickStackFolder.getName());
+			System.out.println((selfDammageFolder.createNewFile()) ? printSignature + fileCreationPrint + selfDammageFolder.getName() : printSignature + fileExistPrint + selfDammageFolder.getName());
+			System.out.println((nyrmcpluginSettings.createNewFile()) ? printSignature + fileCreationPrint + nyrmcpluginSettings.getName() : printSignature + fileExistPrint + nyrmcpluginSettings.getName());
+			System.out.println((quickStackSettings.createNewFile()) ? printSignature + fileCreationPrint + quickStackSettings.getName() : printSignature + fileExistPrint + quickStackSettings.getName());
+			System.out.println((selfDammageSettings.createNewFile()) ? printSignature + fileCreationPrint + selfDammageSettings.getName() : printSignature + fileExistPrint + selfDammageSettings.getName());
+			System.out.println((quickStackPlayerFolder.createNewFile()) ? printSignature + fileCreationPrint + quickStackPlayerFolder.getName() : printSignature + fileExistPrint + quickStackPlayerFolder.getName());
+			System.out.println((selfDammagePlayerFolder.createNewFile()) ? printSignature + fileCreationPrint + selfDammagePlayerFolder.getName() : printSignature + fileExistPrint + selfDammagePlayerFolder.getName());
+			System.out.println((quickStackExcludes.createNewFile()) ? printSignature + fileCreationPrint + quickStackExcludes.getName() : printSignature + fileExistPrint + quickStackExcludes.getName());
+			
+			// Initialize file content
+			InitializePluginSettings(nyrmcpluginSettings);
+			InitializeQuickStackSettings(quickStackSettings);
+			InitializeQuickStackExclude(quickStackExcludes);
+			System.out.println(printSignature + "Initialized " + nyrmcpluginSettings.getName());
+			System.out.println(printSignature + "Initialized " + quickStackSettings.getName());
+			System.out.println(printSignature + "Initialized " + quickStackSettings.getName());
     	}
     	catch(Exception e)
     	{
-    		System.out.println("[nyrmcplugin]: Something went wrong during CreateRequirements");
+    		System.out.println(printSignature + "Something went wrong during CreateRequirements");
     		e.printStackTrace();
     	}
     }
     
-    private static void InitializePluginSettings(File file)
+    /***
+     * Deletes all required folders and files
+     * Might lead to problems if done while running
+     */
+    public void HardResetRequirements()
+    {
+    	try
+    	{
+    		System.out.println(printSignature + "Resetting requirements");
+    		if(nyrmcpluginFolder.exists())
+    		{
+    			if(nyrmcpluginFolder.delete())
+        		{
+        			System.out.println(printSignature + "Deleted " + nyrmcpluginFolder.getName());
+        			this.CreateRequirements();
+        		}
+        		else
+        		{
+        			System.out.println(printSignature + "Failed to delete " + nyrmcpluginFolder.getName());
+        			this.CreateRequirements();
+        		}
+    		}
+    		else
+    		{
+    			System.out.println(printSignature + "Folder did not exist " + nyrmcpluginFolder.getName());
+    			this.CreateRequirements();
+    		}
+    	}
+    	catch (Exception e)
+    	{
+    		System.out.println(printSignature + "Something went wrong while attempting HardResetRequirements");
+    		e.printStackTrace();
+    	}
+    }
+    
+    /***
+     * Deletes all required folders and files but attempts to save user files
+     */
+    public void SoftResetRequirements()
+    {
+    	return;
+    }
+    
+    public static void InitializePluginSettings(File file)
     {
     	// KeyValuePairs
     	String pluginSettingsStrings =  UsefullListener.PluginCommandDefaults.pluginSettingsStringKey + "=" + UsefullListener.PluginCommandDefaults.pluginSettingsString;
@@ -167,7 +185,7 @@ public class RequirementsCreator
     	}
     }
     
-    private static void InitializeQuickStackSettings(File file)
+    public static void InitializeQuickStackSettings(File file)
     {
     	// KeyValuePairs
     	String enableQuickStackString =  UsefullListener.QuickStackDefaults.enableQuickStackStringKey + "=" + UsefullListener.QuickStackDefaults.enableQuickStackString; 
@@ -177,6 +195,8 @@ public class RequirementsCreator
 		String zValueFlag = UsefullListener.QuickStackDefaults.zValueFlagKey + "=" + UsefullListener.QuickStackDefaults.zValueFlag;
 		String sideValueFlag = UsefullListener.QuickStackDefaults.sideValueFlagKey + "=" + UsefullListener.QuickStackDefaults.sideValueFlag;
 		String valueFlagDelim = UsefullListener.QuickStackDefaults.valueFlagDelimKey + "=" + UsefullListener.QuickStackDefaults.valueFlagDelim;
+		String addExclusionFlag = UsefullListener.QuickStackDefaults.addExclusionFlagKey + "=" + UsefullListener.QuickStackDefaults.addExclusionFlag;
+		String removeExclusionFlag = UsefullListener.QuickStackDefaults.removeExclusionFlagKey + "=" + UsefullListener.QuickStackDefaults.removeExclusionFlag;
 		String quickStackHelpFlag = UsefullListener.QuickStackDefaults.quickStackHelpFlagKey + "=" + UsefullListener.QuickStackDefaults.quickStackHelpFlag;
 		String xSearchRadiusDefault = UsefullListener.QuickStackDefaults.xSearchRadiusDefaultKey + "=" + UsefullListener.QuickStackDefaults.xSearchRadiusDefault;
 		String ySearchRadiusDefault = UsefullListener.QuickStackDefaults.ySearchRadiusDefaultKey + "=" + UsefullListener.QuickStackDefaults.ySearchRadiusDefault;
@@ -184,7 +204,7 @@ public class RequirementsCreator
 		String searchRadiusMax = UsefullListener.QuickStackDefaults.searchRadiusMaxKey + "=" + UsefullListener.QuickStackDefaults.searchRadiusMax;
 		
 		String fullFile = enableQuickStackString + "\n" + enableDebugFlag + "\n" + xValueFlag + "\n" + yValueFlag + "\n" + zValueFlag + "\n" + sideValueFlag + "\n"
-				+ valueFlagDelim + "\n" + quickStackHelpFlag + "\n" + xSearchRadiusDefault + "\n" + ySearchRadiusDefault + "\n" + zSearchRadiusDefault + "\n"
+				+ valueFlagDelim + "\n" + addExclusionFlag + "\n" + removeExclusionFlag + "\n" + quickStackHelpFlag + "\n" + xSearchRadiusDefault + "\n" + ySearchRadiusDefault + "\n" + zSearchRadiusDefault + "\n"
 				+ searchRadiusMax;
 		try
     	{
@@ -201,7 +221,7 @@ public class RequirementsCreator
     /***
      * 
      */
-    private static void InitializeQuickStackExclude(File file)
+    public static void InitializeQuickStackExclude(File file)
     {
     	String fullContent = "";
     	for(String s : MinecraftDataContainer.ToolArmor.getToolArmorList())

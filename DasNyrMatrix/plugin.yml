@@ -1,4 +1,4 @@
-name: Plugin
-version: 1.0
+name: nyrmcplugin
+version: 0.0.9
 api-version: 1.17
 main: dev.nyr.main.main

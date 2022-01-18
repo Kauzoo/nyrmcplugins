@@ -181,5 +181,8 @@ public class QuickStackCore
 		player.sendMessage("XDefault: " + UsefullListener.getXsearchradiusdefault(SettingType.QUICKSTACK));
 		player.sendMessage("YDefault: " + UsefullListener.getYsearchradiusdefault(SettingType.QUICKSTACK));
 		player.sendMessage("ZDefault: " + UsefullListener.getZsearchradiusdefault(SettingType.QUICKSTACK));
+		player.sendMessage("By default armor and tools will not be quickstaked. QuickStack exclusions can added or removed");
+		player.sendMessage("Usage: " + enableQuickStack + " " +UsefullListener.getAddExclusionFlag(SettingType.QUICKSTACK) + " (Add item in main hand to exclusion list)");
+		player.sendMessage("Usage: " + enableQuickStack + " " +UsefullListener.getRemoveExclusionFlag(SettingType.QUICKSTACK) + " (Remove item in main hand from exclusion list)");
 	}
 }

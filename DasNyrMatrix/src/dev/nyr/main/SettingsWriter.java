@@ -41,7 +41,7 @@ public class SettingsWriter
 				path = RequirementsCreator.FolderStructure.getSelfDammageFolder();
 				break;
 			case SELFDAMMAGE_PLAYER:
-				path = RequirementsCreator.FolderStructure.getSelfDammagePlayerFodler();
+				path = RequirementsCreator.FolderStructure.getSelfDammagePlayerFolder();
 				break;
 			default:
 				System.out.println(printSignature + "CreateSettingFile: type was not recognized");
@@ -166,7 +166,7 @@ public class SettingsWriter
 					{
 						line = "";
 					}
-					fileContent += line;
+					fileContent += line + "\n";
 				}
 				scanner.close();
 				FileWriter writer = new FileWriter(settingContainer);
@@ -334,7 +334,7 @@ public class SettingsWriter
 				{
 					fileName += ".txt";
 				}
-				return RequirementsCreator.FolderStructure.getSelfDammagePlayerFodler() + File.separator + fileName;
+				return RequirementsCreator.FolderStructure.getSelfDammagePlayerFolder() + File.separator + fileName;
 			case PLUGINSETTINGS:
 				return RequirementsCreator.FolderStructure.getPluginSettings();
 			case QUICKSTACK_EXCLUDES:

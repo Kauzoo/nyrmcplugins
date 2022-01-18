@@ -16,9 +16,10 @@ public class main extends JavaPlugin{
 
         plugin=this;
         
-        RequirementsCreator.CreateRequirements();
-        //UsefullListener.printDebugInfo();
+        RequirementsCreator r = new RequirementsCreator(); 
+        r.CreateRequirements();
         
+        //UsefullListener.printDebugInfo();
         PluginManager pluginManager = Bukkit.getPluginManager();
         pluginManager.registerEvents(new UsefullListener(),this);
         

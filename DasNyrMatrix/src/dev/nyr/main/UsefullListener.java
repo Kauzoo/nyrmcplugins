@@ -172,12 +172,12 @@ public class UsefullListener implements Listener
 		Player player = playerChatEvent.getPlayer();
 		String inputString = playerChatEvent.getMessage();
 		List<String> message = Arrays.asList(inputString.split(" "));
-		playerChatEvent.setCancelled(true);
 		/*
 		 * Parse message for plugin settings
 		 */
 		if(playerChatEvent.getPlayer().isOp() && !message.isEmpty() && message.get(0).startsWith(getPluginSettingsString(SettingType.PLUGINSETTINGS)))
 		{
+			playerChatEvent.setCancelled(true);
 			for(String s : message)
 			{
 				if(s.startsWith(getPluginEnableQuickStackFlag(SettingType.PLUGINSETTINGS)))
@@ -219,14 +219,13 @@ public class UsefullListener implements Listener
 					RequirementsCreator.HardResetRequirements();
 				}
 			}
-			playerChatEvent.setCancelled(true);
 		}
-		
 		/*
 		 * Parse message for quickStack
 		 */
 		if(!message.isEmpty() && message.get(0).equals(getEnableQuickStackString(SettingType.QUICKSTACK)))
 		{
+			playerChatEvent.setCancelled(true);
 			int xSearchRadius = getXsearchradiusdefault(SettingType.QUICKSTACK);
 			int ySearchRadius = getYsearchradiusdefault(SettingType.QUICKSTACK);
 			int zSearchRadius = getZsearchradiusdefault(SettingType.QUICKSTACK);

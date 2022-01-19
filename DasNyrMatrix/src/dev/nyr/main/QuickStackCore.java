@@ -139,6 +139,7 @@ public class QuickStackCore
 			{
 				SettingsWriter.AddSetting(type, UsefullListener.QuickStackDefaults.quickStackExludeKey,
 						player.getItemInHand().getType().toString(), "=", player.getDisplayName());
+				player.sendMessage("Added " + player.getItemInHand().getType().toString() + " to your QuickStackExclude");
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -155,6 +156,7 @@ public class QuickStackCore
 			{
 				SettingsWriter.RemoveSetting(type, UsefullListener.QuickStackDefaults.quickStackExludeKey + "="
 						+ player.getItemInHand().getType().toString(), player.getDisplayName());
+				player.sendMessage("Removed " + player.getItemInHand().getType().toString() + " from your QuickStackExclude");
 			} catch (Exception e)
 			{
 				e.printStackTrace();

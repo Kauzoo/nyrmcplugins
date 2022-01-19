@@ -117,7 +117,7 @@ public class UsefullListener implements Listener
 	public void onPlayerJoinEvent(PlayerJoinEvent event)
 	{
 		Player player = event.getPlayer();
-		player.sendMessage("Server is using nyrmcplugin test build");
+		player.sendMessage("Server is running nyrmcplugin v.0.1.0 [TEST BUILD]");
 		player.sendMessage("Status: SelfDammage:" + isEnableSelfDammage(SettingType.PLUGINSETTINGS) + " QuickStack:" + isEnableQuickStack(SettingType.PLUGINSETTINGS));
 		player.sendMessage("WARNING: Experimental");
 		player.sendMessage("To learn more about QuickStack use: " + getEnableQuickStackString(SettingType.PLUGINSETTINGS) + " " + getQuickStackHelpFlag(SettingType.PLUGINSETTINGS));
@@ -129,7 +129,10 @@ public class UsefullListener implements Listener
 		{
 			SettingsWriter.CreateSettingFile(SettingType.QUICKSTACK_PLAYER, player.getDisplayName());
 			SettingsWriter.CreateSettingFile(SettingType.SELFDAMMAGE_PLAYER, player.getDisplayName());
-			RequirementsCreator.InitializePlayerQuickStackExclude(player);
+			if(!SettingsWriter.CheckFileExistence(SettingType.QUICKSTACK_PLAYER, player.getDisplayName()))
+			{
+				RequirementsCreator.InitializePlayerQuickStackExclude(player);
+			}
 		}
 		catch (Exception e)
 		{
@@ -213,8 +216,7 @@ public class UsefullListener implements Listener
 				}
 				if(s.equals("-reset"))
 				{
-					RequirementsCreator r = new RequirementsCreator();
-					r.HardResetRequirements();
+					RequirementsCreator.HardResetRequirements();
 				}
 			}
 			playerChatEvent.setCancelled(true);

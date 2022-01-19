@@ -299,6 +299,22 @@ public class SettingsWriter
 			throw e;
 		}
 	}
+	
+	public static boolean CheckFileExistence(SettingType type, @Nullable String fileName)
+	{
+		String path = CreatePath(type, fileName, "CheckFileExistence:");
+		try
+		{
+			File file = new File(path);
+			return file.exists();
+		}
+		catch (Exception e)
+		{
+			System.out.println(printSignature + "Something went wrong during file existence check");
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 	/***
 	 * Helper method

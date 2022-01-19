@@ -3,9 +3,6 @@ package dev.nyr.main;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.List;
-import java.nio.*;
-import java.nio.file.FileSystem;
-
 import org.bukkit.entity.Player;
 
 import dev.nyr.main.SettingsWriter.SettingType;
@@ -15,17 +12,6 @@ public class RequirementsCreator
 	private static final String printSignature = "[nyrmcplugin]: ";
 	private static final String fileCreationPrint = "File created: ";
 	private static final String fileExistPrint = "File exists: ";
-	
-	private File nyrmcpluginFolder = new File(FolderStructure.parentFolder);
-	private File quickStackFolder = new File(FolderStructure.getQuickStackFolder());
-	private File selfDammageFolder = new File(FolderStructure.getSelfDammageFolder());
-	private File nyrmcpluginSettings = new File(FolderStructure.getPluginSettings());
-	private File quickStackSettings = new File(FolderStructure.getQuickStackSettingsPath());
-	private File selfDammageSettings = new File(FolderStructure.getSelfDammageSettings());
-	private File quickStackPlayerFolder = new File(FolderStructure.getQuickStackPlayerFolder());
-	private File selfDammagePlayerFolder = new File(FolderStructure.getSelfDammagePlayerFolder());
-	private File quickStackExcludes = new File(FolderStructure.getQuickStackExcludes());
-	
 	
 	public class FolderStructure
     {
@@ -85,30 +71,53 @@ public class RequirementsCreator
 		
 	}
 	
-    public void CreateRequirements()
+    public static void CreateRequirements()
     {
     	System.out.println(printSignature + "Creating Requirements");
     	// Try creating relevant directories and files
     	try
     	{
+    		File nyrmcpluginFolder = new File(FolderStructure.parentFolder);
+    		File quickStackFolder = new File(FolderStructure.getQuickStackFolder());
+    		File selfDammageFolder = new File(FolderStructure.getSelfDammageFolder());
+    		File nyrmcpluginSettings = new File(FolderStructure.getPluginSettings());
+    		File quickStackSettings = new File(FolderStructure.getQuickStackSettingsPath());
+    		File selfDammageSettings = new File(FolderStructure.getSelfDammageSettings());
+    		File quickStackPlayerFolder = new File(FolderStructure.getQuickStackPlayerFolder());
+    		File selfDammagePlayerFolder = new File(FolderStructure.getSelfDammagePlayerFolder());
+    		File quickStackExcludes = new File(FolderStructure.getQuickStackExcludes());
+    		
+    		/*
+    		System.out.println(nyrmcpluginFolder.getAbsolutePath());
+    		System.out.println(quickStackFolder.getAbsolutePath());
+    		System.out.println(selfDammageFolder.getAbsolutePath());
+    		System.out.println(nyrmcpluginSettings.getAbsolutePath());
+    		System.out.println(quickStackSettings.getAbsolutePath());
+    		System.out.println(selfDammageSettings.getAbsolutePath());
+    		System.out.println(quickStackPlayerFolder.getAbsolutePath());
+    		System.out.println(selfDammagePlayerFolder.getAbsolutePath());
+    		System.out.println(quickStackExcludes.getAbsolutePath());
+    		*/
+    		
 			// Create Files
-			System.out.println((nyrmcpluginFolder.createNewFile()) ? printSignature + fileCreationPrint + nyrmcpluginFolder.getName() : printSignature + fileExistPrint + nyrmcpluginFolder.getName());
-			System.out.println((quickStackFolder.createNewFile()) ? printSignature + fileCreationPrint + quickStackFolder.getName() : printSignature + fileExistPrint + quickStackFolder.getName());
-			System.out.println((selfDammageFolder.createNewFile()) ? printSignature + fileCreationPrint + selfDammageFolder.getName() : printSignature + fileExistPrint + selfDammageFolder.getName());
+			System.out.println((nyrmcpluginFolder.mkdir()) ? printSignature + fileCreationPrint + nyrmcpluginFolder.getName() : printSignature + fileExistPrint + nyrmcpluginFolder.getName());
+			System.out.println((quickStackFolder.mkdir()) ? printSignature + fileCreationPrint + quickStackFolder.getName() : printSignature + fileExistPrint + quickStackFolder.getName());
+			System.out.println((selfDammageFolder.mkdir()) ? printSignature + fileCreationPrint + selfDammageFolder.getName() : printSignature + fileExistPrint + selfDammageFolder.getName());
 			System.out.println((nyrmcpluginSettings.createNewFile()) ? printSignature + fileCreationPrint + nyrmcpluginSettings.getName() : printSignature + fileExistPrint + nyrmcpluginSettings.getName());
 			System.out.println((quickStackSettings.createNewFile()) ? printSignature + fileCreationPrint + quickStackSettings.getName() : printSignature + fileExistPrint + quickStackSettings.getName());
 			System.out.println((selfDammageSettings.createNewFile()) ? printSignature + fileCreationPrint + selfDammageSettings.getName() : printSignature + fileExistPrint + selfDammageSettings.getName());
-			System.out.println((quickStackPlayerFolder.createNewFile()) ? printSignature + fileCreationPrint + quickStackPlayerFolder.getName() : printSignature + fileExistPrint + quickStackPlayerFolder.getName());
-			System.out.println((selfDammagePlayerFolder.createNewFile()) ? printSignature + fileCreationPrint + selfDammagePlayerFolder.getName() : printSignature + fileExistPrint + selfDammagePlayerFolder.getName());
+			System.out.println((quickStackPlayerFolder.mkdir()) ? printSignature + fileCreationPrint + quickStackPlayerFolder.getName() : printSignature + fileExistPrint + quickStackPlayerFolder.getName());
+			System.out.println((selfDammagePlayerFolder.mkdir()) ? printSignature + fileCreationPrint + selfDammagePlayerFolder.getName() : printSignature + fileExistPrint + selfDammagePlayerFolder.getName());
 			System.out.println((quickStackExcludes.createNewFile()) ? printSignature + fileCreationPrint + quickStackExcludes.getName() : printSignature + fileExistPrint + quickStackExcludes.getName());
 			
-			// Initialize file content
 			InitializePluginSettings(nyrmcpluginSettings);
-			InitializeQuickStackSettings(quickStackSettings);
-			InitializeQuickStackExclude(quickStackExcludes);
 			System.out.println(printSignature + "Initialized " + nyrmcpluginSettings.getName());
+			InitializeQuickStackSettings(quickStackSettings);
 			System.out.println(printSignature + "Initialized " + quickStackSettings.getName());
+			InitializeQuickStackExclude(quickStackExcludes);
 			System.out.println(printSignature + "Initialized " + quickStackSettings.getName());
+			
+			
     	}
     	catch(Exception e)
     	{
@@ -121,28 +130,30 @@ public class RequirementsCreator
      * Deletes all required folders and files
      * Might lead to problems if done while running
      */
-    public void HardResetRequirements()
+    public static void HardResetRequirements()
     {
     	try
     	{
+    		File nyrmcpluginFolder = new File(FolderStructure.parentFolder);
+    		
     		System.out.println(printSignature + "Resetting requirements");
     		if(nyrmcpluginFolder.exists())
     		{
     			if(nyrmcpluginFolder.delete())
         		{
         			System.out.println(printSignature + "Deleted " + nyrmcpluginFolder.getName());
-        			this.CreateRequirements();
+        			CreateRequirements();
         		}
         		else
         		{
         			System.out.println(printSignature + "Failed to delete " + nyrmcpluginFolder.getName());
-        			this.CreateRequirements();
+        			CreateRequirements();
         		}
     		}
     		else
     		{
     			System.out.println(printSignature + "Folder did not exist " + nyrmcpluginFolder.getName());
-    			this.CreateRequirements();
+    			CreateRequirements();
     		}
     	}
     	catch (Exception e)

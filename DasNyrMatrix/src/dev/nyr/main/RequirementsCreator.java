@@ -3,6 +3,9 @@ package dev.nyr.main;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.List;
+
+import javax.annotation.Nullable;
+
 import org.bukkit.entity.Player;
 
 import dev.nyr.main.SettingsWriter.SettingType;
@@ -86,38 +89,50 @@ public class RequirementsCreator
     		File quickStackPlayerFolder = new File(FolderStructure.getQuickStackPlayerFolder());
     		File selfDammagePlayerFolder = new File(FolderStructure.getSelfDammagePlayerFolder());
     		File quickStackExcludes = new File(FolderStructure.getQuickStackExcludes());
-    		
-    		/*
-    		System.out.println(nyrmcpluginFolder.getAbsolutePath());
-    		System.out.println(quickStackFolder.getAbsolutePath());
-    		System.out.println(selfDammageFolder.getAbsolutePath());
-    		System.out.println(nyrmcpluginSettings.getAbsolutePath());
-    		System.out.println(quickStackSettings.getAbsolutePath());
-    		System.out.println(selfDammageSettings.getAbsolutePath());
-    		System.out.println(quickStackPlayerFolder.getAbsolutePath());
-    		System.out.println(selfDammagePlayerFolder.getAbsolutePath());
-    		System.out.println(quickStackExcludes.getAbsolutePath());
-    		*/
-    		
+    		    		
 			// Create Files
 			System.out.println((nyrmcpluginFolder.mkdir()) ? printSignature + fileCreationPrint + nyrmcpluginFolder.getName() : printSignature + fileExistPrint + nyrmcpluginFolder.getName());
 			System.out.println((quickStackFolder.mkdir()) ? printSignature + fileCreationPrint + quickStackFolder.getName() : printSignature + fileExistPrint + quickStackFolder.getName());
 			System.out.println((selfDammageFolder.mkdir()) ? printSignature + fileCreationPrint + selfDammageFolder.getName() : printSignature + fileExistPrint + selfDammageFolder.getName());
-			System.out.println((nyrmcpluginSettings.createNewFile()) ? printSignature + fileCreationPrint + nyrmcpluginSettings.getName() : printSignature + fileExistPrint + nyrmcpluginSettings.getName());
-			System.out.println((quickStackSettings.createNewFile()) ? printSignature + fileCreationPrint + quickStackSettings.getName() : printSignature + fileExistPrint + quickStackSettings.getName());
+			//System.out.println((nyrmcpluginSettings.createNewFile()) ? printSignature + fileCreationPrint + nyrmcpluginSettings.getName() : printSignature + fileExistPrint + nyrmcpluginSettings.getName());
+			//System.out.println((quickStackSettings.createNewFile()) ? printSignature + fileCreationPrint + quickStackSettings.getName() : printSignature + fileExistPrint + quickStackSettings.getName());
 			System.out.println((selfDammageSettings.createNewFile()) ? printSignature + fileCreationPrint + selfDammageSettings.getName() : printSignature + fileExistPrint + selfDammageSettings.getName());
 			System.out.println((quickStackPlayerFolder.mkdir()) ? printSignature + fileCreationPrint + quickStackPlayerFolder.getName() : printSignature + fileExistPrint + quickStackPlayerFolder.getName());
 			System.out.println((selfDammagePlayerFolder.mkdir()) ? printSignature + fileCreationPrint + selfDammagePlayerFolder.getName() : printSignature + fileExistPrint + selfDammagePlayerFolder.getName());
-			System.out.println((quickStackExcludes.createNewFile()) ? printSignature + fileCreationPrint + quickStackExcludes.getName() : printSignature + fileExistPrint + quickStackExcludes.getName());
+			//System.out.println((quickStackExcludes.createNewFile()) ? printSignature + fileCreationPrint + quickStackExcludes.getName() : printSignature + fileExistPrint + quickStackExcludes.getName());
 			
-			InitializePluginSettings(nyrmcpluginSettings);
-			System.out.println(printSignature + "Initialized " + nyrmcpluginSettings.getName());
-			InitializeQuickStackSettings(quickStackSettings);
-			System.out.println(printSignature + "Initialized " + quickStackSettings.getName());
-			InitializeQuickStackExclude(quickStackExcludes);
-			System.out.println(printSignature + "Initialized " + quickStackSettings.getName());
+			if(nyrmcpluginSettings.createNewFile())
+			{
+				System.out.println(printSignature + fileCreationPrint + nyrmcpluginSettings.getName());
+				InitializePluginSettings(nyrmcpluginSettings);
+				System.out.println(printSignature + "Initialized " + nyrmcpluginSettings.getName());
+			}
+			else
+			{
+				System.out.println(printSignature + fileExistPrint + nyrmcpluginSettings.getName());
+			}
 			
+			if(quickStackSettings.createNewFile())
+			{
+				System.out.println(printSignature + fileCreationPrint + quickStackSettings.getName());
+				InitializeQuickStackSettings(quickStackSettings);
+				System.out.println(printSignature + "Initialized " + quickStackSettings.getName());
+			}
+			else
+			{
+				System.out.println(printSignature + fileExistPrint + quickStackSettings.getName());
+			}
 			
+			if(quickStackExcludes.createNewFile())
+			{
+				System.out.println(printSignature + fileCreationPrint + quickStackExcludes.getName());
+				InitializeQuickStackExclude(quickStackExcludes);
+				System.out.println(printSignature + "Initialized " + quickStackSettings.getName());
+			}
+			else
+			{
+				System.out.println(printSignature + fileExistPrint + quickStackSettings.getName());
+			}
     	}
     	catch(Exception e)
     	{
@@ -163,6 +178,118 @@ public class RequirementsCreator
     	}
     }
     
+    public static boolean ForceGlobalSettingReinitialiazation(@Nullable Player player)
+    {
+    	if(TryReinitializePluginSettings(player) && TryReinitializeQuickStackSettings(player) && TryReinitializeQuickStackExcludeSettings(player))
+    	{
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Successfully reset all Files");
+    		}
+    		System.out.println(printSignature + "Successfully reset all Files");
+    		return true;
+    	}
+    	if(!player.equals(null))
+		{
+			player.sendMessage(printSignature + "Failed to reset all Files");
+		}
+		System.out.println(printSignature + "Failed to reset all Files");
+    	return false;
+    }
+    
+    public static boolean TryReinitializePluginSettings(@Nullable Player player)
+    {
+    	try
+    	{
+    		
+    		File file = new File(FolderStructure.getPluginSettings());
+    		System.out.println("Trying to reinitialize: " + file.getName());
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Trying to reinitialize: " + file.getName());
+    		}
+    		InitializePluginSettings(file);
+    		System.out.println(printSignature + "Initialized " + file.getName());
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Initialized " + file.getName());
+    		}
+    		return true;
+    	}
+    	catch (Exception e)
+    	{
+    		System.out.println(printSignature + "Something went wrong during TryReinitializePluginSettings");
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage();
+    		}
+    		e.printStackTrace();
+    		return false;
+    	}
+    }
+    
+    public static boolean TryReinitializeQuickStackSettings(@Nullable Player player)
+    {
+    	try
+    	{
+    		
+    		File file = new File(FolderStructure.getQuickStackSettingsPath());
+    		System.out.println("Trying to reinitialize: " + file.getName());
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Trying to reinitialize: " + file.getName());
+    		}
+    		InitializePluginSettings(file);
+    		System.out.println(printSignature + "Initialized " + file.getName());
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Initialized " + file.getName());
+    		}
+    		return true;
+    	}
+    	catch (Exception e)
+    	{
+    		System.out.println(printSignature + "Something went wrong during TryReinitializeQuickStackSettings");
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Something went wrong during TryReinitializeQuickStackSettings");
+    		}
+    		e.printStackTrace();
+    	}
+    	return false;
+    }
+    
+    public static boolean TryReinitializeQuickStackExcludeSettings(@Nullable Player player)
+    {
+    	try
+    	{
+    		
+    		File file = new File(FolderStructure.getQuickStackSettingsPath());
+    		System.out.println("Trying to reinitialize: " + file.getName());
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Trying to reinitialize: " + file.getName());
+    		}
+    		InitializePluginSettings(file);
+    		System.out.println(printSignature + "Initialized " + file.getName());
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Initialized " + file.getName());
+    		}
+    		return true;
+    	}
+    	catch (Exception e)
+    	{
+    		System.out.println(printSignature + "Something went wrong during TryReinitializeQuickStackExcludeSettings");
+    		if(!player.equals(null))
+    		{
+    			player.sendMessage(printSignature + "Something went wrong during TryReinitializeQuickStackExcludeSettings");
+    		}
+    		e.printStackTrace();
+    		return false;
+    	}
+    }
+    
     /***
      * Deletes all required folders and files but attempts to save user files
      */
@@ -171,7 +298,7 @@ public class RequirementsCreator
     	return;
     }
     
-    public static void InitializePluginSettings(File file)
+    private static void InitializePluginSettings(File file)
     {
     	// KeyValuePairs
     	String pluginSettingsStrings =  UsefullListener.PluginCommandDefaults.pluginSettingsStringKey + "=" + UsefullListener.PluginCommandDefaults.pluginSettingsString;
@@ -196,7 +323,7 @@ public class RequirementsCreator
     	}
     }
     
-    public static void InitializeQuickStackSettings(File file)
+    private static void InitializeQuickStackSettings(File file)
     {
     	// KeyValuePairs
     	String enableQuickStackString =  UsefullListener.QuickStackDefaults.enableQuickStackStringKey + "=" + UsefullListener.QuickStackDefaults.enableQuickStackString; 
@@ -232,7 +359,7 @@ public class RequirementsCreator
     /***
      * 
      */
-    public static void InitializeQuickStackExclude(File file)
+    private static void InitializeQuickStackExclude(File file)
     {
     	String fullContent = "";
     	for(String s : MinecraftDataContainer.ToolArmor.getToolArmorList())

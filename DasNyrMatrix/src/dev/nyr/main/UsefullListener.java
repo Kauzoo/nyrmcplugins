@@ -30,7 +30,9 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageModifier;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -69,7 +71,6 @@ public class UsefullListener implements Listener
 		public static final String pluginHelpFlagKey = "pluginHelpFlag";
 		public static final String enableQuickStackKey = "enableQuickStack";
 		public static final String enableSelfDammageKey = "enableSelfDammage";
-		
 	}
 	
 	// Quickstack
@@ -138,7 +139,12 @@ public class UsefullListener implements Listener
 		{
 			e.printStackTrace();
 		}
-		
+	}
+	
+	@EventHandler
+	public void onPlayerInteractEvent(PlayerInteractEvent event)
+	{
+		Player player = event.getPlayer();
 	}
 	
 	@EventHandler
